@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTube Navigator - YOUTUBE 학습 큐레이터</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google AdSense 자동 광고 코드 (실제 pub-id로 교체 필요) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+            crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics (선택사항) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+        }
+        
+        /* 상단 네비게이션 바 개선 */
+        .navbar {
+            background: #000 !important;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            padding: 1rem 0;
+            border-bottom: 2px solid #FF0000;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: #FF0000 !important;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand i {
+            font-size: 2rem;
+        }
+        
+        /* 프로필 아이콘 스타일 */
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            border: 2px solid transparent;
+        }
+        
+        .profile-icon:hover {
+            transform: scale(1.1);
+            border-color: #FF0000;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+            color: white;
+        }
+        
+        /* 메인 컨테이너 */
+        .main-container {
+            background: rgba(255,255,255,0.98);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            margin: 2rem auto;
+            max-width: 1400px;
+            min-height: 85vh;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        /* 검색 섹션 - 최상단으로 이동 */
+        .search-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 2px solid #FF0000;
+        }
+        
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .search-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: #333;
+            border-radius: 50px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid #444;
+        }
+        
+        .search-input-group:focus-within {
+            box-shadow: 0 12px 40px rgba(255,0,0,0.3);
+            transform: translateY(-2px);
+            border-color: #FF0000;
+        }
+        
+        .search-input {
+            border: none;
+            padding: 18px 25px;
+            font-size: 1.1rem;
+            flex: 1;
+            background: transparent;
+            outline: none;
+            color: #fff;
+        }
+        
+        .search-input::placeholder {
+            color: #adb5bd;
+        }
+        
+        .search-btn {
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border: none;
+            padding: 18px 35px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .search-btn:hover {
+            background: linear-gradient(45deg, #CC0000, #990000);
+            transform: scale(1.02);
+        }
+        
+        /* 타이틀 섹션 */
+        .title-section {
+            background: #fff;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .sub-title {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .category-chips {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .category-chip {
+            background: linear-gradient(45deg, #333, #1a1a1a);
+            color: white;
+            border: 2px solid #666;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .category-chip:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,0,0,0.3);
+            border-color: #FF0000;
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+        }
+        
+        .category-chip.active {
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border-color: #FF0000;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+        }
+        
+        /* 필터 섹션 개선 */
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1.8rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.6rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+        
+        .filter-select {
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        .filter-select:focus {
+            border-color: #FF0000;
+            box-shadow: 0 0 0 0.2rem rgba(255,0,0,0.25);
+            outline: none;
+        }
+        
+        /* 탭 섹션 개선 */
+        .tab-section {
+            background: white;
+            padding: 1.5rem 2rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .nav-tabs {
+            border-bottom: 3px solid #e9ecef;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            margin-right: 1rem;
+            border-radius: 15px 15px 0 0;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,0,0,0.3);
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            background: rgba(255,0,0,0.1);
+            color: #FF0000;
+            transform: translateY(-1px);
+        }
+        
+        /* 결과 섹션 */
+        .results-section {
+            padding: 2.5rem;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            min-height: 500px;
+        }
+        
+        /* 비디오 카드 개선 */
+        .video-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+            position: relative;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            border-color: #FF0000;
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.08);
+        }
+        
+        .duration-badge {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+        }
+        
+        .bookmark-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            color: #666;
+        }
+        
+        .bookmark-btn:hover {
+            background: #fff;
+            transform: scale(1.15);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            color: #FF0000;
+        }
+        
+        .bookmark-btn.bookmarked {
+            color: #FF0000;
+            background: rgba(255,0,0,0.1);
+        }
+        
+        .video-info {
+            padding: 1.8rem;
+        }
+        
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .video-title a:hover {
+            color: #FF0000;
+        }
+        
+        .video-channel {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-top: 1px solid #f8f9fa;
+        }
+        
+        .video-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* 로딩 및 빈 상태 개선 */
+        .loading-spinner {
+            text-align: center;
+            padding: 4rem;
+        }
+        
+        .spinner-border {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-width: 0.4em;
+            color: #FF0000;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: #ddd;
+            opacity: 0.7;
+        }
+        
+        .empty-state h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        /* 더보기 버튼 개선 */
+        .load-more-section {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+        }
+        
+        .load-more-btn {
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border: none;
+            border-radius: 50px;
+            padding: 18px 45px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(255,0,0,0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255,0,0,0.6);
+            background: linear-gradient(45deg, #CC0000, #990000);
+        }
+        
+        .load-more-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 페이지네이션 스타일 */
+        .pagination {
+            margin: 2rem 0;
+        }
+        
+        .pagination .page-link {
+            color: #FF0000;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 5px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            background: white;
+        }
+        
+        .pagination .page-link:hover {
+            color: white;
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border-color: #FF0000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,0,0,0.4);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border-color: #FF0000;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+        }
+        
+        .pagination .page-item.disabled .page-link {
+            color: #ccc;
+            background: #f8f9fa;
+            border-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        
+        .pagination .page-item.disabled .page-link:hover {
+            transform: none;
+            box-shadow: none;
+            background: #f8f9fa;
+            color: #ccc;
+        }
+        
+        /* 반응형 디자인 개선 */
+        @media (max-width: 1200px) {
+            .main-container {
+                margin: 1rem;
+                max-width: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.2rem;
+            }
+            
+            .sub-title {
+                font-size: 1rem;
+            }
+            
+            .search-header {
+                padding: 1.5rem;
+            }
+            
+            .search-input {
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .search-btn {
+                padding: 15px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .category-chips {
+                gap: 0.5rem;
+            }
+            
+            .category-chip {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            
+            .filter-section {
+                padding: 1.5rem 1rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .video-card {
+                margin-bottom: 1.5rem;
+            }
+            
+            .video-thumbnail img {
+                height: 180px;
+            }
+            
+            .video-info {
+                padding: 1.5rem;
+            }
+            
+            .results-section {
+                padding: 2rem 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .main-title {
+                font-size: 1.8rem;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+            
+            .search-input {
+                border-bottom: 1px solid #e9ecef;
+                border-radius: 15px 15px 0 0;
+            }
+            
+            .search-btn {
+                border-radius: 0 0 15px 15px;
+                width: 100%;
+            }
+            
+            .category-chips {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .category-chip {
+                width: 80%;
+                max-width: 200px;
+            }
+            
+            .filter-section .row {
+                gap: 1rem;
+            }
+            
+            .filter-section .col-md-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+        
+        /* 애니메이션 효과 추가 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 하위 카테고리 섹션 스타일 */
+        .subcategory-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(248,249,250,0.5);
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .subcategory-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .subcategory-chips {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .subcategory-chip {
+            background: linear-gradient(45deg, #666, #333);
+            color: white;
+            border: 2px solid #888;
+            padding: 0.7rem 1.3rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .subcategory-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,0,0,0.3);
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border-color: #FF0000;
+        }
+        
+        .subcategory-chip.active {
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            border-color: #FF0000;
+            box-shadow: 0 4px 15px rgba(255,0,0,0.4);
+        }
+        
+        /* 애니메이션 효과 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 경고 메시지 스타일 */
+        .alert-danger {
+            background: linear-gradient(45deg, #FF4444, #CC0000);
+            border: none;
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(255,68,68,0.3);
+        }
+        
+        .alert-danger i {
+            margin-right: 0.5rem;
+        }
+        
+        /* 푸터 스타일 */
+        .footer-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 3px solid #FF0000;
+        }
+        
+        .footer-title {
+            color: #FF0000;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-subtitle {
+            color: #FF0000;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #FF0000;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .footer-description {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .business-contact {
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-item {
+            margin-bottom: 0.8rem;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+        
+        .contact-item a {
+            color: #FF0000;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .contact-item a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .ad-products {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .ad-products li {
+            margin-bottom: 0.7rem;
+            color: #ddd;
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+        
+        .ad-products li:hover {
+            color: #FF0000;
+            transform: translateX(5px);
+        }
+        
+        .ad-products li i {
+            color: #FF0000;
+            width: 20px;
+        }
+        
+        .footer-divider {
+            border-color: #444;
+            margin: 2rem 0 1rem;
+        }
+        
+        .copyright {
+            color: #999;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* 광고 배너 영역 */
+        .ad-banner {
+            background: linear-gradient(45deg, #1a1a1a, #000);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #FF0000;
+        }
+        
+        .ad-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .ad-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ad-banner h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .ad-banner p {
+            margin: 0.5rem 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* AdSense 광고 스타일 */
+        .adsense-banner {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .adsense-banner .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.1);
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .fallback-ad {
+            background: linear-gradient(45deg, #1a1a1a, #000);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            border: 2px solid #FF0000;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fallback-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        .side-ad {
+            background: #f8f9fa;
+            border: 2px dashed #FF0000;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 12px;
+            margin: 1rem 0;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        
+        .side-ad:hover {
+            background: rgba(255,0,0,0.05);
+            transform: scale(1.02);
+        }
+        
+        .side-ad i {
+            font-size: 2rem;
+            color: #FF0000;
+            margin-bottom: 1rem;
+        }
+        
+        .side-ad h6 {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .side-ad p {
+            font-size: 0.85rem;
+            margin: 0;
+            color: #666;
+        }
+        
+        /* AdSense 사이드바 광고 스타일 */
+        .adsense-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .ad-label {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .adsbygoogle {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        
+        .fallback-sidebar-ad {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* AdSense 푸터 광고 스타일 */
+        .adsense-footer {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .adsense-footer .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.1);
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- 상단 네비게이션 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fab fa-youtube"></i>
+                EduTube Navigator
+            </a>
+            <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
+                <a href="mailto:miriv10@naver.com?subject=광고 문의" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-bullhorn me-2"></i>광고 문의
+                </a>
+                <a href="#" class="profile-icon" title="프로필">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container fade-in">
+            <!-- 검색 헤더 (최상단) -->
+            <div class="search-header">
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" id="searchInput" 
+                               placeholder="원하는 학습 콘텐츠를 검색해보세요...">
+                        <button class="search-btn" type="button" id="searchBtn">
+                            <i class="fas fa-search me-2"></i>검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 타이틀 섹션 -->
+            <div class="title-section">
+                <p class="sub-title">빠르고 정확한 학습 콘텐츠 큐레이션</p>
+                
+                <!-- 메인 카테고리 칩 -->
+                <div class="category-chips">
+                    <button class="category-chip" data-category="language">
+                        <i class="fas fa-language me-2"></i>언어 학습
+                    </button>
+                    <button class="category-chip" data-category="programming">
+                        <i class="fas fa-code me-2"></i>프로그래밍
+                    </button>
+                    <button class="category-chip" data-category="hobby">
+                        <i class="fas fa-palette me-2"></i>취미/자격증
+                    </button>
+                </div>
+                
+                <!-- 하위 카테고리 탭 섹션 -->
+                <div class="subcategory-section" id="subcategorySection" style="display: none;">
+                    <!-- 언어 학습 하위 탭 -->
+                    <div class="subcategory-tabs" id="language-tabs" style="display: none;">
+                        <h4 class="subcategory-title"><i class="fas fa-language me-2"></i>언어 학습</h4>
+                        <div class="subcategory-chips">
+                            <button class="subcategory-chip" data-category="language" data-subcategory="english">
+                                <i class="fas fa-flag-usa me-2"></i>영어
+                            </button>
+                            <button class="subcategory-chip" data-category="language" data-subcategory="chinese">
+                                <i class="fas fa-flag me-2"></i>중국어
+                            </button>
+                            <button class="subcategory-chip" data-category="language" data-subcategory="japanese">
+                                <i class="fas fa-torii-gate me-2"></i>일본어
+                            </button>
+                            <button class="subcategory-chip" data-category="language" data-subcategory="other">
+                                <i class="fas fa-globe-americas me-2"></i>기타 언어
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 프로그래밍 하위 탭 -->
+                    <div class="subcategory-tabs" id="programming-tabs" style="display: none;">
+                        <h4 class="subcategory-title"><i class="fas fa-code me-2"></i>프로그래밍</h4>
+                        <div class="subcategory-chips">
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="python">
+                                <i class="fab fa-python me-2"></i>Python
+                            </button>
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="javascript">
+                                <i class="fab fa-js-square me-2"></i>JavaScript
+                            </button>
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="web">
+                                <i class="fas fa-laptop-code me-2"></i>웹개발
+                            </button>
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="data">
+                                <i class="fas fa-chart-bar me-2"></i>데이터분석
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 취미/자격증 하위 탭 -->
+                    <div class="subcategory-tabs" id="hobby-tabs" style="display: none;">
+                        <h4 class="subcategory-title"><i class="fas fa-palette me-2"></i>취미/자격증</h4>
+                        <div class="subcategory-chips">
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="hobby">
+                                <i class="fas fa-heart me-2"></i>취미
+                            </button>
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="certificate">
+                                <i class="fas fa-certificate me-2"></i>자격증
+                            </button>
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="exercise">
+                                <i class="fas fa-dumbbell me-2"></i>운동
+                            </button>
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="cooking">
+                                <i class="fas fa-utensils me-2"></i>요리
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 필터 섹션 -->
+            <div class="filter-section">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-clock me-1"></i>학습 시간
+                            </label>
+                            <select class="form-select filter-select" id="durationFilter">
+                                <option value="">전체</option>
+                                <option value="short">10분 미만</option>
+                                <option value="medium">10-30분</option>
+                                <option value="long">30분 이상</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-layer-group me-1"></i>난이도
+                            </label>
+                            <select class="form-select filter-select" id="difficultyFilter">
+                                <option value="">전체</option>
+                                <option value="beginner">초급</option>
+                                <option value="intermediate">중급</option>
+                                <option value="advanced">고급</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-sort me-1"></i>정렬
+                            </label>
+                            <select class="form-select filter-select" id="sortFilter">
+                                <option value="viewCount">인기순</option>
+                                <option value="relevance">관련성순</option>
+                                <option value="date">최신순</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-globe me-1"></i>언어
+                            </label>
+                            <select class="form-select filter-select" id="languageFilter">
+                                <option value="ko">한국어</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AdSense 상단 배너 광고 -->
+            <div class="adsense-banner">
+                <div class="ad-label">광고</div>
+                <!-- AdSense 광고 단위 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                     data-ad-slot="YOUR_AD_SLOT_ID"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+                
+                <!-- 대체 광고 (AdSense 승인 전까지 표시) -->
+                <div class="fallback-ad">
+                    <div class="ad-banner-content">
+                        <h5><i class="fas fa-bullhorn me-2"></i>광고 문의: miriv10@naver.com</h5>
+                        <p>교육 콘텐츠 플랫폼에서 효과적인 마케팅을 시작하세요! 맞춤형 광고 솔루션 제공</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 비디오/쇼츠 탭 -->
+            <div class="tab-section">
+                <ul class="nav nav-tabs" id="contentTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="video-tab" data-bs-toggle="tab" data-bs-target="#video-content">
+                            <i class="fas fa-play me-2"></i>Video
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="shorts-tab" data-bs-toggle="tab" data-bs-target="#shorts-content">
+                            <i class="fas fa-mobile-alt me-2"></i>Shorts
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 결과 섹션 -->
+            <div class="results-section">
+                <div class="tab-content" id="contentTabsContent">
+                    <div class="tab-pane fade show active" id="video-content">
+                        <div class="row">
+                            <!-- 메인 콘텐츠 영역 -->
+                            <div class="col-lg-9">
+                                <div id="loadingSpinner" class="loading-spinner d-none">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">검색 중...</span>
+                                    </div>
+                                    <p class="mt-3">최적의 학습 콘텐츠를 찾고 있습니다...</p>
+                                </div>
+                                
+                                <div id="resultsContainer" class="row g-4">
+                                    <!-- 검색 결과가 여기에 표시됩니다 -->
+                                </div>
+                                
+                                <div id="emptyState" class="empty-state">
+                                    <i class="fas fa-search"></i>
+                                    <h4>검색어를 입력하거나 카테고리를 선택해주세요</h4>
+                                    <p>원하는 학습 콘텐츠를 찾아드리겠습니다.</p>
+                                </div>
+                                
+                                <!-- 더보기 버튼 -->
+                                <div id="loadMoreSection" class="load-more-section d-none">
+                                    <button id="loadMoreBtn" class="load-more-btn">
+                                        <i class="fas fa-plus me-2"></i>더보기 (10개 더 보기)
+                                    </button>
+                                </div>
+                                
+                                <!-- 페이지네이션 -->
+                                <div id="paginationSection" class="text-center mt-4 d-none">
+                                    <nav aria-label="검색 결과 페이지네이션">
+                                        <ul class="pagination pagination-lg justify-content-center">
+                                            <li class="page-item" id="prevPage">
+                                                <a class="page-link" href="#" aria-label="이전">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <li class="page-item active" data-page="1">
+                                                <a class="page-link" href="#">1</a>
+                                            </li>
+                                            <li class="page-item" data-page="2">
+                                                <a class="page-link" href="#">2</a>
+                                            </li>
+                                            <li class="page-item" data-page="3">
+                                                <a class="page-link" href="#">3</a>
+                                            </li>
+                                            <li class="page-item" data-page="4">
+                                                <a class="page-link" href="#">4</a>
+                                            </li>
+                                            <li class="page-item" data-page="5">
+                                                <a class="page-link" href="#">5</a>
+                                            </li>
+                                            <li class="page-item" data-page="6">
+                                                <a class="page-link" href="#">6</a>
+                                            </li>
+                                            <li class="page-item" data-page="7">
+                                                <a class="page-link" href="#">7</a>
+                                            </li>
+                                            <li class="page-item" data-page="8">
+                                                <a class="page-link" href="#">8</a>
+                                            </li>
+                                            <li class="page-item" data-page="9">
+                                                <a class="page-link" href="#">9</a>
+                                            </li>
+                                            <li class="page-item" data-page="10">
+                                                <a class="page-link" href="#">10</a>
+                                            </li>
+                                            <li class="page-item" id="nextPage">
+                                                <a class="page-link" href="#" aria-label="다음">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            
+                            <!-- 사이드 광고 영역 -->
+                            <div class="col-lg-3">
+                                <!-- AdSense 사이드바 광고 -->
+                                <div class="adsense-sidebar">
+                                    <div class="ad-label">광고</div>
+                                    <ins class="adsbygoogle"
+                                         style="display:block"
+                                         data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                                         data-ad-slot="YOUR_SIDEBAR_AD_SLOT_ID"
+                                         data-ad-format="rectangle"></ins>
+                                    <script>
+                                         (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script>
+                                    
+                                    <!-- 대체 광고 -->
+                                    <div class="fallback-sidebar-ad">
+                                        <i class="fas fa-bullhorn"></i>
+                                        <h6>광고 문의</h6>
+                                        <p>교육 콘텐츠 타겟 광고<br>효과적인 마케팅 솔루션</p>
+                                        <a href="mailto:miriv10@naver.com?subject=광고 문의" class="btn btn-outline-danger btn-sm mt-2">
+                                            문의하기
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="side-ad">
+                                    <i class="fas fa-star"></i>
+                                    <h6>프리미엄 서비스</h6>
+                                    <p>광고 없는 깔끔한 경험<br>개인화된 추천 서비스</p>
+                                    <a href="mailto:miriv10@naver.com?subject=프리미엄 문의" class="btn btn-outline-danger btn-sm mt-2">
+                                        업그레이드
+                                    </a>
+                                </div>
+                                
+                                <div class="side-ad">
+                                    <i class="fas fa-handshake"></i>
+                                    <h6>콘텐츠 제휴</h6>
+                                    <p>교육 기관 · 강사 협력<br>콘텐츠 큐레이션 파트너십</p>
+                                    <a href="mailto:miriv10@naver.com?subject=제휴 문의" class="btn btn-outline-danger btn-sm mt-2">
+                                        제휴 문의
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="shorts-content">
+                        <div id="shortsContainer" class="row g-4">
+                            <!-- 쇼츠 결과가 여기에 표시됩니다 -->
+                        </div>
+                        
+                        <div id="shortsEmptyState" class="empty-state">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4>1분 이내의 짧은 학습 콘텐츠</h4>
+                            <p>빠르게 학습할 수 있는 쇼츠 영상을 찾아드리겠습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AdSense 푸터 광고 -->
+    <div class="container">
+        <div class="adsense-footer">
+            <div class="ad-label">광고</div>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                 data-ad-slot="YOUR_FOOTER_AD_SLOT_ID"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
+    <!-- 푸터 섹션 추가 -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="footer-title">
+                        <i class="fab fa-youtube me-2"></i>EduTube Navigator
+                    </h5>
+                    <p class="footer-description">
+                        AI 기반 YouTube 학습 콘텐츠 큐레이션 플랫폼<br>
+                        최적의 교육 영상을 빠르고 정확하게 찾아드립니다.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-subtitle">비즈니스 문의</h6>
+                    <div class="business-contact">
+                        <div class="contact-item">
+                            <i class="fas fa-bullhorn me-2"></i>
+                            <strong>광고 문의:</strong> 
+                            <a href="mailto:miriv10@naver.com?subject=광고 문의">miriv10@naver.com</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-handshake me-2"></i>
+                            <strong>제휴 문의:</strong> 
+                            <a href="mailto:miriv10@naver.com?subject=제휴 문의">miriv10@naver.com</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-subtitle">광고 상품</h6>
+                    <ul class="ad-products">
+                        <li><i class="fas fa-rectangle-ad me-2"></i>배너 광고</li>
+                        <li><i class="fas fa-star me-2"></i>스폰서드 콘텐츠</li>
+                        <li><i class="fas fa-link me-2"></i>제휴 마케팅</li>
+                        <li><i class="fas fa-chart-line me-2"></i>맞춤형 광고 솔루션</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-divider">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="copyright">
+                        © 2025 EduTube Navigator. All rights reserved. | 
+                        한국어 교육 콘텐츠 전문 플랫폼
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentQuery = '';
+        let currentCategory = '';
+        let currentSubcategory = '';
+        let currentNextPageToken = null;
+        let isLoading = false;
+        let bookmarkedVideos = JSON.parse(localStorage.getItem('bookmarkedVideos') || '[]');
+        
+        // 페이지네이션 관련 변수
+        let allVideos = []; // 전체 영상 데이터
+        let currentPage = 1;
+        let videosPerPage = 4;
+        let totalPages = 0;
+        
+        // 북마크 상태 확인
+        function isBookmarked(videoId) {
+            return bookmarkedVideos.includes(videoId);
+        }
+        
+        // 북마크 토글
+        function toggleBookmark(videoId) {
+            const index = bookmarkedVideos.indexOf(videoId);
+            if (index > -1) {
+                bookmarkedVideos.splice(index, 1);
+            } else {
+                bookmarkedVideos.push(videoId);
+            }
+            localStorage.setItem('bookmarkedVideos', JSON.stringify(bookmarkedVideos));
+            
+            // UI 업데이트
+            const bookmarkBtn = document.querySelector(`[data-video-id="${videoId}"]`);
+            if (bookmarkBtn) {
+                bookmarkBtn.classList.toggle('bookmarked');
+                bookmarkBtn.innerHTML = isBookmarked(videoId) ? 
+                    '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            }
+        }
+        
+        // 하위 카테고리 탭 표시/숨김
+        function showSubcategoryTabs(category) {
+            // 모든 하위 탭 숨김
+            document.querySelectorAll('.subcategory-tabs').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // 선택된 카테고리의 하위 탭 표시
+            const targetTab = document.getElementById(`${category}-tabs`);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                document.getElementById('subcategorySection').style.display = 'block';
+            }
+        }
+        
+        // 하위 카테고리 탭 숨김
+        function hideSubcategoryTabs() {
+            document.getElementById('subcategorySection').style.display = 'none';
+            // 모든 하위 카테고리 비활성화
+            document.querySelectorAll('.subcategory-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+        }
+        
+        // 검색 실행
+        function performSearch(loadMore = false) {
+            if (isLoading) return;
+            
+            const query = document.getElementById('searchInput').value.trim();
+            const duration = document.getElementById('durationFilter').value;
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const sortOrder = document.getElementById('sortFilter').value;
+            const language = document.getElementById('languageFilter').value;
+            const activeTab = document.querySelector('.nav-link.active').id;
+            const isShorts = activeTab === 'shorts-tab';
+            
+            isLoading = true;
+            
+            // 새 검색인 경우 페이지 토큰 초기화
+            if (!loadMore) {
+                currentNextPageToken = null;
+                const container = isShorts ? document.getElementById('shortsContainer') : document.getElementById('resultsContainer');
+                container.innerHTML = '';
+            }
+            
+            // 로딩 스피너 표시
+            if (!loadMore) {
+                document.getElementById('loadingSpinner').classList.remove('d-none');
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('shortsEmptyState').style.display = 'none';
+                document.getElementById('loadMoreSection').classList.add('d-none');
+            } else {
+                document.getElementById('loadMoreBtn').disabled = true;
+                document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>로딩 중...';
+            }
+            
+            const searchData = {
+                query: query || currentQuery,
+                category: currentCategory,
+                subcategory: currentSubcategory,
+                duration: isShorts ? 'short' : duration,
+                difficulty: difficulty,
+                sortOrder: sortOrder,
+                language: language,
+                is_shorts: isShorts,
+                pageToken: loadMore ? currentNextPageToken : null
+            };
+            
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(searchData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                isLoading = false;
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('loadMoreBtn').disabled = false;
+                document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-plus me-2"></i>더보기 (10개 더 보기)';
+                
+                if (data.success) {
+                    currentNextPageToken = data.nextPageToken;
+                    displayResults(data.videos, isShorts, loadMore);
+                    
+                    // 더보기 버튼 표시/숨김
+                    if (data.nextPageToken && data.videos.length > 0) {
+                        document.getElementById('loadMoreSection').classList.remove('d-none');
+                    } else {
+                        document.getElementById('loadMoreSection').classList.add('d-none');
+                    }
+                } else {
+                    console.error('검색 실패:', data.error);
+                    displayError('검색 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                isLoading = false;
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('loadMoreBtn').disabled = false;
+                document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-plus me-2"></i>더보기 (10개 더 보기)';
+                console.error('검색 오류:', error);
+                displayError('네트워크 오류가 발생했습니다.');
+            });
+        }
+        
+        // 결과 표시
+        function displayResults(videos, isShorts = false, append = false) {
+            const containerId = isShorts ? 'shortsContainer' : 'resultsContainer';
+            const emptyStateId = isShorts ? 'shortsEmptyState' : 'emptyState';
+            const container = document.getElementById(containerId);
+            const emptyState = document.getElementById(emptyStateId);
+            
+            if (!videos || videos.length === 0) {
+                if (!append) {
+                    container.innerHTML = '';
+                    emptyState.style.display = 'block';
+                    document.getElementById('paginationSection').classList.add('d-none');
+                }
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // 전체 영상 데이터 저장 (새 검색인 경우)
+            if (!append) {
+                allVideos = videos;
+                currentPage = 1;
+                totalPages = Math.ceil(videos.length / videosPerPage);
+                displayCurrentPage();
+                setupPagination();
+            } else {
+                // 더 많은 영상이 추가된 경우
+                allVideos = allVideos.concat(videos);
+                totalPages = Math.ceil(allVideos.length / videosPerPage);
+                setupPagination();
+            }
+        }
+        
+        // 현재 페이지의 영상들만 표시
+        function displayCurrentPage() {
+            const activeTab = document.querySelector('.nav-link.active').id;
+            const isShorts = activeTab === 'shorts-tab';
+            const containerId = isShorts ? 'shortsContainer' : 'resultsContainer';
+            const container = document.getElementById(containerId);
+            
+            const startIndex = (currentPage - 1) * videosPerPage;
+            const endIndex = startIndex + videosPerPage;
+            const pageVideos = allVideos.slice(startIndex, endIndex);
+            
+            if (pageVideos.length === 0) {
+                container.innerHTML = '<div class="col-12"><p class="text-center text-muted">이 페이지에는 영상이 없습니다.</p></div>';
+                return;
+            }
+            
+            const videosHTML = pageVideos.map((video, index) => `
+                <div class="col-lg-12 col-md-12 slide-up" style="animation-delay: ${index * 0.1}s;">
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+                            <div class="duration-badge">${video.duration}</div>
+                            <button class="bookmark-btn ${isBookmarked(video.videoId) ? 'bookmarked' : ''}" 
+                                    data-video-id="${video.videoId}" onclick="toggleBookmark('${video.videoId}')">
+                                <i class="${isBookmarked(video.videoId) ? 'fas' : 'far'} fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">${video.title}</a>
+                            </h3>
+                            <p class="video-channel">
+                                <i class="fas fa-user-circle me-2"></i>${video.channelTitle}
+                            </p>
+                            <div class="video-meta">
+                                <span><i class="fas fa-eye me-1"></i>조회수 ${video.viewCount?.toLocaleString() || '정보 없음'}</span>
+                                <span><i class="fas fa-calendar me-1"></i>${video.publishedAt}</span>
+                            </div>
+                            ${video.description ? `<p class="video-description">${video.description}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = videosHTML;
+        }
+        
+        // 페이지네이션 설정
+        function setupPagination() {
+            const paginationSection = document.getElementById('paginationSection');
+            
+            if (totalPages <= 1) {
+                paginationSection.classList.add('d-none');
+                document.getElementById('loadMoreSection').classList.add('d-none');
+                return;
+            }
+            
+            // 더보기 버튼 숨기고 페이지네이션 표시
+            document.getElementById('loadMoreSection').classList.add('d-none');
+            paginationSection.classList.remove('d-none');
+            
+            // 페이지 번호 버튼들 업데이트
+            const pageItems = document.querySelectorAll('.pagination .page-item[data-page]');
+            pageItems.forEach(item => {
+                const pageNum = parseInt(item.dataset.page);
+                if (pageNum <= totalPages) {
+                    item.style.display = 'block';
+                    item.classList.toggle('active', pageNum === currentPage);
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // 이전/다음 버튼 상태 업데이트
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            
+            prevBtn.classList.toggle('disabled', currentPage === 1);
+            nextBtn.classList.toggle('disabled', currentPage === totalPages);
+        }
+        
+        // 페이지 변경
+        function changePage(newPage) {
+            if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+            
+            currentPage = newPage;
+            displayCurrentPage();
+            setupPagination();
+            
+            // 페이지 변경 시 스크롤을 결과 섹션으로 이동
+            document.getElementById('resultsContainer').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // 이벤트 리스너
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            currentQuery = document.getElementById('searchInput').value.trim();
+            currentCategory = '';
+            currentSubcategory = '';
+            // 카테고리 활성화 해제
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.subcategory-chip').forEach(c => c.classList.remove('active'));
+            hideSubcategoryTabs();
+            performSearch();
+        });
+        
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                currentQuery = e.target.value.trim();
+                currentCategory = '';
+                currentSubcategory = '';
+                // 카테고리 활성화 해제
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.subcategory-chip').forEach(c => c.classList.remove('active'));
+                hideSubcategoryTabs();
+                performSearch();
+            }
+        });
+        
+        // 더보기 버튼 클릭
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            performSearch(true);
+        });
+        
+        // 메인 카테고리 칩 클릭
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                // 기존 active 클래스 제거
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.subcategory-chip').forEach(c => c.classList.remove('active'));
+                
+                chip.classList.add('active');
+                
+                const category = chip.dataset.category;
+                currentCategory = category;
+                currentSubcategory = '';
+                currentQuery = '';
+                document.getElementById('searchInput').value = '';
+                
+                // 하위 카테고리 탭 표시
+                showSubcategoryTabs(category);
+            });
+        });
+        
+        // 하위 카테고리 칩 클릭 (이벤트 위임 사용)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('subcategory-chip') || e.target.closest('.subcategory-chip')) {
+                const chip = e.target.classList.contains('subcategory-chip') ? e.target : e.target.closest('.subcategory-chip');
+                
+                // 같은 카테고리 내 다른 하위 카테고리 비활성화
+                const category = chip.dataset.category;
+                document.querySelectorAll(`.subcategory-chip[data-category="${category}"]`).forEach(c => {
+                    c.classList.remove('active');
+                });
+                
+                chip.classList.add('active');
+                
+                currentCategory = chip.dataset.category;
+                currentSubcategory = chip.dataset.subcategory;
+                currentQuery = '';
+                document.getElementById('searchInput').value = '';
+                
+                performSearch();
+            }
+        });
+        
+        // 필터 변경 시 자동 검색
+        ['durationFilter', 'difficultyFilter', 'sortFilter', 'languageFilter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', () => {
+                if (currentQuery || currentCategory) {
+                    performSearch();
+                }
+            });
+        });
+        
+        // 탭 변경 시 검색 재실행
+        document.getElementById('contentTabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-link')) {
+                setTimeout(() => {
+                    if (currentQuery || currentCategory) {
+                        performSearch();
+                    }
+                }, 100);
+            }
+        });
+        
+        // 페이지 로드 시 초기화 - 한국어 교육 콘텐츠 표시
+        document.addEventListener('DOMContentLoaded', () => {
+            // 프로그래밍 카테고리를 기본으로 설정
+            currentCategory = 'programming';
+            document.querySelector('[data-category="programming"]').classList.add('active');
+            showSubcategoryTabs('programming');
+            // 한국어와 인기순으로 기본 설정
+            document.getElementById('languageFilter').value = 'ko';
+            document.getElementById('sortFilter').value = 'viewCount';
+            // 기본 검색 실행
+            performSearch();
+        });
+        
+        // 오류 표시
+        function displayError(message) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${message}
+                    </div>
+                </div>
+            `;
+            document.getElementById('loadMoreSection').classList.add('d-none');
+            document.getElementById('paginationSection').classList.add('d-none');
+        }
+        
+        // 페이지네이션 버튼 클릭 이벤트
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.pagination .page-item')) {
+                e.preventDefault();
+                const pageItem = e.target.closest('.page-item');
+                
+                if (pageItem.classList.contains('disabled')) return;
+                
+                if (pageItem.id === 'prevPage') {
+                    changePage(currentPage - 1);
+                } else if (pageItem.id === 'nextPage') {
+                    changePage(currentPage + 1);
+                } else if (pageItem.dataset.page) {
+                    changePage(parseInt(pageItem.dataset.page));
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
