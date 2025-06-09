@@ -375,13 +375,13 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
             category_korean_queries = {
                 'programming': "프로그래밍 코딩 개발 파이썬 자바스크립트 웹개발 팁",
                 'language': "영어 일본어 중국어 언어 회화 발음 팁",
-                'hobby': "요리 그림 운동 취미 DIY 팁"
+                'hobby': "취미 요리 운동 그림 DIY"
             }
         else:
             category_korean_queries = {
                 'programming': "프로그래밍 강의 파이썬 기초 자바스크립트 튜토리얼 웹개발 입문 코딩 배우기 개발자 공부",
-                'language': "영어 강의 영어회화 일본어 중국어 언어학습 회화 문법 발음 TOEIC",
-                'hobby': "요리 강의 그림 그리기 운동 헬스 취미 DIY 만들기 배우기"
+                'language': "영어 배우기 일본어 중국어 언어 학습 회화 문법 발음 어학 TOEIC IELTS 외국어",
+                'hobby': "요리 배우기 그림 그리기 운동 입문 취미 활동 DIY 만들기 handmade 배우는"
             }
         if category in category_korean_queries:
             query = category_korean_queries[category]
@@ -439,7 +439,38 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     
     try:
         search_response = youtube.search().list(**search_params).execute()
-        print(f"YouTube API 응답 받음: {len(search_response.get('items', []))}개 영상")
+        initial_results = len(search_response.get('items', []))
+        print(f"YouTube API 응답 받음: {initial_results}개 영상")
+        
+        # 첫 번째 검색에서 결과가 적을 때 백업 검색 실행
+        if initial_results < 5 and category:
+            print(f"⚠️ 결과가 부족합니다. 백업 검색을 시도합니다...")
+            
+            # 백업 검색어 (더 간단하고 광범위하게)
+            backup_queries = {
+                'programming': "파이썬 강의" if not is_shorts else "코딩 팁",
+                'language': "영어 배우기" if not is_shorts else "영어 팁", 
+                'hobby': "요리 배우기" if not is_shorts else "요리 팁"
+            }
+            
+            if category in backup_queries:
+                backup_params = search_params.copy()
+                backup_params['q'] = backup_queries[category]
+                backup_params['maxResults'] = 30
+                
+                print(f"백업 검색 파라미터: {backup_params}")
+                
+                try:
+                    backup_response = youtube.search().list(**backup_params).execute()
+                    backup_results = len(backup_response.get('items', []))
+                    print(f"백업 검색 응답: {backup_results}개 영상")
+                    
+                    if backup_results > initial_results:
+                        print(f"✅ 백업 검색이 더 좋은 결과를 제공했습니다.")
+                        search_response = backup_response
+                except Exception as e:
+                    print(f"❌ 백업 검색 실패: {e}")
+        
         videos = []
         
         # 한국어 교육 필수 키워드 (더 엄격하게)
@@ -454,7 +485,15 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
             '과정', '단계별', '차근차근', '완벽', '전체', '시리즈',
             # 언어학습 전용 키워드 추가
             '영어', '일본어', '중국어', '언어', '회화', '문법', '발음', '단어',
-            '어학', 'TOEIC', 'IELTS', '외국어', '번역', '해석', '리스닝', '스피킹'
+            '어학', 'TOEIC', 'IELTS', '외국어', '번역', '해석', '리스닝', '스피킹',
+            # 취미/자격증 전용 키워드 추가
+            '요리', '레시피', '쿠킹', '베이킹', '한식', '양식', '중식', '일식',
+            '그림', '그리기', '드로잉', '스케치', '페인팅', '미술', '디자인',
+            '운동', '헬스', '요가', '필라테스', '홈트', '스트레칭', '다이어트',
+            '취미', '자격증', '컴활', '정보처리', '토익', '회계', '기사',
+            'DIY', '만들기', '공예', '핸드메이드', '수공예', '취미생활',
+            '음악', '악기', '기타', '피아노', '드럼', '노래', '작곡',
+            '사진', '촬영', '카메라', '편집', '포토샵', '영상'
         ]
         
         # 영어 교육 키워드
@@ -551,8 +590,8 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                     korean_edu_matches = [keyword for keyword in korean_educational_keywords if keyword in content_text]
                     english_edu_matches = [keyword for keyword in english_educational_keywords if keyword in content_text]
                     
-                    # 한국어 콘텐츠인 경우 한국어 교육 키워드가 필수
-                    if has_korean_chars and len(korean_edu_matches) == 0:
+                    # 한국어 콘텐츠인 경우 한국어 교육 키워드가 필수 (취미는 예외)
+                    if has_korean_chars and len(korean_edu_matches) == 0 and category != 'hobby':
                         print(f"한국어 교육키워드 없음: {title[:50]}...")
                         continue
                     
@@ -566,9 +605,11 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                     english_score = len(english_edu_matches)
                     total_edu_score = korean_score + english_score
                     
-                    # 언어학습 카테고리는 기준을 완화
+                    # 카테고리별 점수 기준 완화
                     if category == 'language':
                         min_score = 1 if is_shorts else 1  # 언어학습은 점수 기준 완화
+                    elif category == 'hobby':
+                        min_score = 1 if is_shorts else 1  # 취미도 점수 기준 완화
                     else:
                         # Shorts는 교육 점수 기준을 완화 (더 많은 콘텐츠 표시)
                         min_score = 1 if is_shorts else 3
