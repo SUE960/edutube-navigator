@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, jsonify
-from llama_cpp import Llama
 import json
 import re
-import torch
 import os
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
@@ -14,9 +12,29 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# GGUF 모델 파일 경로 - 배포 환경에서는 사용하지 않음
+# 환경변수에서 설정 읽기
 GGUF_MODEL_PATH = os.getenv("GGUF_MODEL_PATH", "./openhermes-2.5-mistral-7b.Q4_K_M.gguf")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-for-production")
+
+# YouTube API 키 확인
+if not YOUTUBE_API_KEY:
+    print("⚠️ YouTube API 키가 설정되지 않았습니다. 환경변수를 확인해주세요.")
+    # Vercel 환경변수 재확인 시도
+    YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY") or os.getenv("YOUTUBE_DATA_API_KEY")
+    
+    # 여전히 없으면 기본값 사용 (개발용 - 실제 배포에서는 환경변수 필수)
+    if not YOUTUBE_API_KEY:
+        YOUTUBE_API_KEY = "AIzaSyBn_AhmUqK4Gn2Yq-gLEv1vKKra_ahcHps"
+        print("⚠️ 기본 API 키를 사용합니다. 프로덕션에서는 환경변수를 설정해주세요.")
+    else:
+        print("✅ 환경변수에서 API 키를 찾았습니다.")
+
+# Flask 설정
+app.secret_key = SECRET_KEY
+
+# 배포 환경 감지
+IS_PRODUCTION = os.getenv('VERCEL') or os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('HEROKU') or os.getenv('FLASK_ENV') == 'production'
 
 # 전역 변수로 모델을 한 번만 로드
 _llm_model = None
@@ -25,7 +43,15 @@ _youtube = None
 def get_youtube_service():
     global _youtube
     if _youtube is None:
-        _youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+        try:
+            if not YOUTUBE_API_KEY:
+                print("⚠️ YouTube API 키가 없습니다!")
+                return None
+            _youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+            print("✅ YouTube 서비스 연결 성공")
+        except Exception as e:
+            print(f"❌ YouTube 서비스 연결 실패: {e}")
+            return None
     return _youtube
 
 # ISO 8601 duration을 사람이 읽을 수 있는 형식으로 변환
@@ -60,7 +86,7 @@ def format_published_date(published_at):
 def load_gguf_model(model_path: str):
     global _llm_model
     # 배포 환경이 아닌 로컬 환경에서는 모델 로딩 시도
-    if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('HEROKU'):
+    if IS_PRODUCTION:
         print("배포 환경에서는 GGUF 모델을 사용하지 않습니다.")
         return None
     
@@ -101,7 +127,7 @@ def generate_text_with_gguf_model(llm_model, prompt_text: str, max_tokens: int =
 
 def extract_learning_conditions_with_gguf_llm(user_input: str) -> dict:
     # 배포 환경에서는 간단한 키워드 매칭으로 대체
-    if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('HEROKU'):
+    if IS_PRODUCTION:
         return {
             "주제": "일반 검색",
             "난이도": "N/A",
@@ -278,6 +304,11 @@ def simplify_search_query(query: str) -> str:
 def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, sortOrder='relevance', language=None, page_token=None, is_shorts=False):
     youtube = get_youtube_service()
     
+    # YouTube 서비스 연결 확인
+    if youtube is None:
+        print("❌ YouTube 서비스를 사용할 수 없습니다.")
+        return {'videos': [], 'nextPageToken': None}
+    
     # 검색어 간소화 (긴 자연어 검색어 처리)
     original_query = query
     if query and len(query) > 15:
@@ -366,11 +397,12 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     # 모든 카테고리에서 제한을 완화하여 더 많은 결과 확보
     youtube_category_id = None
     
+    # 배포 환경에서 안정성을 위해 카테고리 ID 완전 제거
     # Shorts의 경우 카테고리 제한을 완화 (더 많은 결과를 위해)
-    if is_shorts:
-        youtube_category_id = None  # 카테고리 제한 없음
-    else:
-        youtube_category_id = category_mapping.get(category, '27')  # 기본값을 교육으로
+    # if is_shorts:
+    #     youtube_category_id = None  # 카테고리 제한 없음
+    # else:
+    #     youtube_category_id = category_mapping.get(category, '27')  # 기본값을 교육으로
     
     # 기본 검색 파라미터
     search_params = {
@@ -676,5 +708,8 @@ def get_categories():
     return jsonify(categories)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5005))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # 로컬 개발용
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5005)), debug=False)
+else:
+    # Vercel 배포용 - 이 부분이 중요!
+    app.debug = False
