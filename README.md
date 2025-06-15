@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # EduTube Navigator
 
 YouTube 학습 컨텐츠를 빠르게 찾을 수 있는 웹 플랫폼입니다.
@@ -49,3 +50,34 @@ python app.py
 ## 라이선스
 
 MIT License 
+=======
+# 🎯 EduTube Navigator
+
+YouTube 학습 콘텐츠 큐레이션 플랫폼
+
+## 🚀 배포 정보
+- **최초 배포**: 2025년 6월 9일
+- **최근 업데이트**: 2025년 6월 9일 21:30
+- **배포 URL**: https://edutube-navigator.vercel.app
+
+## 📊 주요 기능
+- YouTube 교육 콘텐츠 검색 & 필터링
+- 카테고리별 큐레이션 (프로그래밍, 언어학습, 취미 등)
+- AdSense 광고 연동
+- 반응형 디자인
+- 북마크 기능
+
+## 🎨 기술 스택
+- **Backend**: Flask (Python)
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
+- **API**: YouTube Data API v3
+- **배포**: Vercel
+- **광고**: Google AdSense
+
+## 📞 문의
+- **광고 문의**: miriv10@naver.com
+- **기술 문의**: GitHub Issues
+
+---
+*Made with ❤️ for better learning experiences* 
+>>>>>>> ffee8f7 (0615 배포)

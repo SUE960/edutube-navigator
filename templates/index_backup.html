@@ -1,0 +1,3050 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTube Navigator - YOUTUBE 학습 큐레이터</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google AdSense 자동 광고 코드 (실제 pub-id로 교체 필요) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+            crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics (선택사항) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --dark-border: #334155;
+            --light-text: #f8fafc;
+            --gray-text: #94a3b8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: var(--light-text);
+            line-height: 1.6;
+        }
+        
+        /* 스크롤바 스타일링 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--dark-border);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-text);
+        }
+        
+        /* 네비게이션 바 */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--dark-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--light-text) !important;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.025em;
+        }
+        
+        .navbar-brand i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 프로필 아이콘 */
+        .profile-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .profile-icon:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+        
+        /* 메인 컨테이너 */
+        .main-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            margin: 2rem auto;
+            max-width: 1400px;
+            min-height: 85vh;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 검색 헤더 */
+        .search-header {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-card) 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff08" points="0,1000 1000,0 1000,1000"/></svg>');
+            pointer-events: none;
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .search-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--dark-card);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .search-input-group:focus-within {
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+        }
+        
+        .search-input {
+            border: none;
+            padding: 20px 24px;
+            font-size: 1.1rem;
+            flex: 1;
+            background: transparent;
+            outline: none;
+            color: var(--light-text);
+            font-weight: 400;
+        }
+        
+        .search-input::placeholder {
+            color: var(--gray-text);
+            font-weight: 400;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            padding: 20px 32px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: scale(1.02);
+        }
+        
+        .search-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .search-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* 타이틀 섹션 */
+        .title-section {
+            background: #fff;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, var(--dark-bg), var(--dark-card));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .sub-title {
+            font-size: 1.125rem;
+            color: var(--gray-text);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        .category-chips {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .category-chip {
+            background: #f8fafc;
+            color: var(--dark-card);
+            border: 1px solid #e2e8f0;
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .category-chip:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .category-chip:hover::before {
+            opacity: 0.1;
+        }
+        
+        .category-chip.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .category-chip.active::before {
+            opacity: 0;
+        }
+        
+        /* 하위 카테고리 */
+        .subcategory-section {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .subcategory-chips {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .subcategory-chip {
+            background: white;
+            color: var(--dark-card);
+            border: 1px solid #e2e8f0;
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+        
+        .subcategory-chip:hover {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subcategory-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+        
+        /* 필터 섹션 */
+        .filters-section {
+            background: white;
+            padding: 2rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .filter-group {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .filter-group h5 {
+            color: var(--dark-card);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .form-select {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* 콘텐츠 탭 */
+        .nav-tabs {
+            border-bottom: 2px solid #f1f5f9;
+            background: white;
+            padding: 0 2rem;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--gray-text);
+            font-weight: 500;
+            padding: 1rem 2rem;
+            border-radius: 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border-color: transparent;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            border-color: transparent;
+            background: transparent;
+        }
+        
+        .nav-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px 2px 0 0;
+        }
+        
+        /* 비디오 카드 */
+        .video-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #f1f5f9;
+            margin-bottom: 2rem;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            border-color: #e2e8f0;
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.05);
+        }
+        
+        .duration-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+        
+        .bookmark-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            color: var(--gray-text);
+        }
+        
+        .bookmark-btn:hover {
+            background: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .bookmark-btn.bookmarked {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .video-info {
+            padding: 1.5rem;
+        }
+        
+        .video-title a {
+            color: var(--dark-card);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+        
+        .video-title a:hover {
+            color: var(--primary-color);
+        }
+        
+        .video-channel {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+            margin: 0.75rem 0;
+            font-weight: 500;
+        }
+        
+        .video-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--gray-text);
+            margin-bottom: 1rem;
+        }
+        
+        .video-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .video-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 2rem;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: var(--primary-color);
+        }
+        
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-text);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-card);
+        }
+        
+        /* 더보기 버튼 */
+        .load-more-section {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+        }
+        
+        .load-more-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+        }
+        
+        .load-more-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 페이지네이션 */
+        .pagination-section {
+            background: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .pagination .page-link {
+            border: 1px solid #e2e8f0;
+            color: var(--gray-text);
+            padding: 0.75rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination .page-link:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 애니메이션 */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+            
+            .search-header {
+                padding: 2rem 1rem;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .category-chips {
+                gap: 0.5rem;
+            }
+            
+            .category-chip {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.875rem;
+            }
+            
+            .video-thumbnail img {
+                height: 200px;
+            }
+            
+            .video-info {
+                padding: 1rem;
+            }
+            
+            .video-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-container {
+                margin: 0.8rem;
+                border-radius: 14px;
+            }
+            
+            .search-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .main-title {
+                font-size: 1.8rem;
+            }
+            
+            .category-chips {
+                gap: 0.4rem;
+            }
+            
+            .category-chip {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            .video-thumbnail img {
+                height: 180px;
+            }
+            
+            .video-info {
+                padding: 0.8rem;
+            }
+            
+            .video-meta {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+        }
+        
+        /* 탭 섹션 개선 */
+        .tab-section {
+            background: white;
+            padding: 1.5rem 2rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .nav-tabs {
+            border-bottom: 3px solid #e9ecef;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            margin-right: 1rem;
+            border-radius: 15px 15px 0 0;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: #333;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            background: #f8f9fa;
+            color: #333;
+            transform: translateY(-1px);
+        }
+        
+        /* 결과 섹션 */
+        .results-section {
+            padding: 2.5rem;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            min-height: 500px;
+        }
+        
+        /* 비디오 카드 개선 */
+        .video-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+            position: relative;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            border-color: #333;
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.08);
+        }
+        
+        .duration-badge {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+        }
+        
+        .bookmark-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            color: #666;
+        }
+        
+        .bookmark-btn:hover {
+            background: #fff;
+            transform: scale(1.15);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            color: #333;
+        }
+        
+        .bookmark-btn.bookmarked {
+            color: #333;
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .video-info {
+            padding: 1.8rem;
+        }
+        
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .video-title a:hover {
+            color: #333;
+        }
+        
+        .video-channel {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-top: 1px solid #f8f9fa;
+        }
+        
+        .video-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* 로딩 및 빈 상태 개선 */
+        .loading-spinner {
+            text-align: center;
+            padding: 4rem;
+        }
+        
+        .spinner-border {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-width: 0.4em;
+            color: #333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: #ddd;
+            opacity: 0.7;
+        }
+        
+        .empty-state h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        /* 더보기 버튼 개선 */
+        .load-more-section {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+        }
+        
+        .load-more-btn {
+            background: #333;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 45px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+            background: #222;
+        }
+        
+        .load-more-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 페이지네이션 스타일 */
+        .pagination {
+            margin: 2rem 0;
+        }
+        
+        .pagination .page-link {
+            color: #333;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 5px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            background: white;
+        }
+        
+        .pagination .page-link:hover {
+            color: white;
+            background: #333;
+            border-color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: #333;
+            border-color: #333;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .pagination .page-item.disabled .page-link {
+            color: #ccc;
+            background: #f8f9fa;
+            border-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        
+        .pagination .page-item.disabled .page-link:hover {
+            transform: none;
+            box-shadow: none;
+            background: #f8f9fa;
+            color: #ccc;
+        }
+        
+        /* 반응형 디자인 개선 */
+        @media (max-width: 1200px) {
+            .main-container {
+                margin: 1rem;
+                max-width: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.3rem 1rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            .main-title {
+                font-size: 1.8rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .sub-title {
+                font-size: 0.9rem;
+                margin-bottom: 1rem;
+            }
+            
+            .search-header {
+                padding: 1rem;
+            }
+            
+            .search-input {
+                padding: 10px 15px;
+                font-size: 0.95rem;
+            }
+            
+            .search-btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+            
+            .category-chips {
+                gap: 0.4rem;
+                margin: 1rem 0;
+            }
+            
+            .category-chip {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .filter-section {
+                padding: 1rem;
+            }
+            
+            .nav-tabs {
+                margin-bottom: 1rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .video-card {
+                margin-bottom: 1rem;
+            }
+            
+            .video-thumbnail img {
+                height: 160px;
+            }
+            
+            .video-info {
+                padding: 1rem;
+            }
+            
+            .video-title {
+                font-size: 1rem;
+                line-height: 1.3;
+            }
+            
+            .video-meta {
+                font-size: 0.8rem;
+                margin: 0.5rem 0;
+            }
+            
+            .video-description {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            
+            .results-section {
+                padding: 1rem;
+            }
+            
+            .ad-banner {
+                padding: 1rem;
+                margin: 1.5rem 0;
+            }
+            
+            .load-more-section {
+                padding: 1.5rem;
+            }
+            
+            .load-more-btn {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .subcategory-section {
+                margin-top: 1rem;
+                padding: 1rem;
+            }
+            
+            .subcategory-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .subcategory-chips {
+                gap: 0.4rem;
+            }
+            
+            .subcategory-chip {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .footer-section {
+                padding: 2rem 0 1.5rem;
+                margin-top: 2rem;
+            }
+            
+            .footer-title {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .footer-subtitle {
+                font-size: 1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .footer-description {
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+            
+            .contact-item {
+                margin-bottom: 0.6rem;
+                font-size: 0.85rem;
+            }
+            
+            .empty-state {
+                padding: 3rem 1rem;
+            }
+            
+            .empty-state i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+            
+            .empty-state h4 {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 0.2rem 0.8rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .main-title {
+                font-size: 1.6rem;
+                margin-bottom: 0.2rem;
+            }
+            
+            .sub-title {
+                font-size: 0.8rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .search-header {
+                padding: 0.8rem;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+                border-radius: 12px;
+            }
+            
+            .search-input {
+                border-bottom: 1px solid #e9ecef;
+                border-radius: 12px 12px 0 0;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .search-btn {
+                border-radius: 0 0 12px 12px;
+                width: 100%;
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+            
+            .category-chips {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.3rem;
+                margin: 0.8rem 0;
+            }
+            
+            .category-chip {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+                flex: 0 0 auto;
+                min-width: auto;
+            }
+            
+            .filter-section {
+                padding: 0.8rem;
+            }
+            
+            .filter-section .row {
+                gap: 0.5rem;
+            }
+            
+            .filter-section .col-md-3 {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .nav-tabs {
+                margin-bottom: 0.8rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.85rem;
+                margin-right: 0.3rem;
+            }
+            
+            .video-card {
+                margin-bottom: 0.8rem;
+            }
+            
+            .video-thumbnail img {
+                height: 140px;
+            }
+            
+            .video-info {
+                padding: 0.8rem;
+            }
+            
+            .video-title {
+                font-size: 0.95rem;
+                line-height: 1.3;
+                margin-bottom: 0.5rem;
+            }
+            
+            .video-meta {
+                font-size: 0.75rem;
+                margin: 0.4rem 0;
+            }
+            
+            .video-description {
+                font-size: 0.8rem;
+                line-height: 1.3;
+                -webkit-line-clamp: 2;
+            }
+            
+            .results-section {
+                padding: 0.8rem;
+            }
+            
+            .ad-banner {
+                padding: 0.8rem;
+                margin: 1rem 0;
+                font-size: 0.9rem;
+            }
+            
+            .load-more-section {
+                padding: 1.5rem;
+            }
+            
+            .load-more-btn {
+                padding: 10px 25px;
+                font-size: 0.9rem;
+            }
+            
+            .subcategory-section {
+                margin-top: 1rem;
+                padding: 1rem;
+            }
+            
+            .subcategory-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .subcategory-chips {
+                gap: 0.4rem;
+            }
+            
+            .subcategory-chip {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .footer-section {
+                padding: 2rem 0 1.5rem;
+                margin-top: 2rem;
+            }
+            
+            .footer-title {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .footer-subtitle {
+                font-size: 1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .footer-description {
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+            
+            .contact-item {
+                margin-bottom: 0.6rem;
+                font-size: 0.85rem;
+            }
+            
+            .empty-state {
+                padding: 3rem 1rem;
+            }
+            
+            .empty-state i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+            
+            .empty-state h4 {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+        }
+        
+        /* 애니메이션 효과 추가 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 하위 카테고리 섹션 스타일 */
+        .subcategory-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(248,249,250,0.5);
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .subcategory-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.8rem;
+            text-align: center;
+        }
+        
+        .subcategory-chips {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .subcategory-chip {
+            background: linear-gradient(45deg, #666, #333);
+            color: white;
+            border: 2px solid #888;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .subcategory-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            background: #e9ecef;
+            border-color: #333;
+        }
+        
+        .subcategory-chip.active {
+            background: #333;
+            color: white;
+            border-color: #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* 애니메이션 효과 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 경고 메시지 스타일 */
+        .alert-danger {
+            background: #dc3545;
+            border: none;
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(220,53,69,0.3);
+        }
+        
+        .alert-danger i {
+            margin-right: 0.5rem;
+        }
+        
+        /* 푸터 스타일 */
+        .footer-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 3px solid #333;
+        }
+        
+        .footer-title {
+            color: #ccc;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-subtitle {
+            color: #ccc;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .footer-description {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .business-contact {
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-item {
+            margin-bottom: 0.8rem;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+        
+        .contact-item a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .contact-item a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .ad-products {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .ad-products li {
+            margin-bottom: 0.7rem;
+            color: #ddd;
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+        
+        .ad-products li:hover {
+            color: #ccc;
+            transform: translateX(5px);
+        }
+        
+        .ad-products li i {
+            color: #ccc;
+            width: 20px;
+        }
+        
+        .footer-divider {
+            border-color: #444;
+            margin: 2rem 0 1rem;
+        }
+        
+        .copyright {
+            color: #999;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        /* 광고 배너 영역 */
+        .ad-banner {
+            background: linear-gradient(45deg, #1a1a1a, #000);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        .ad-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .ad-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ad-banner h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .ad-banner p {
+            margin: 0.5rem 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        /* AdSense 광고 스타일 */
+        .adsense-banner {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .adsense-banner .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.1);
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .fallback-ad {
+            background: linear-gradient(45deg, #1a1a1a, #000);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fallback-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        .side-ad {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 12px;
+            margin: 1rem 0;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        
+        .side-ad:hover {
+            background: #e9ecef;
+            transform: scale(1.02);
+        }
+        
+        .side-ad i {
+            font-size: 2rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .side-ad h6 {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .side-ad p {
+            font-size: 0.85rem;
+            margin: 0;
+            color: #666;
+        }
+        
+        /* AdSense 사이드바 광고 스타일 */
+        .adsense-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .ad-label {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .adsbygoogle {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        
+        .fallback-sidebar-ad {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* AdSense 푸터 광고 스타일 */
+        .adsense-footer {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .adsense-footer .ad-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.1);
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        /* 콘텐츠 섹션 */
+        .content-section {
+            background: white;
+            min-height: 60vh;
+        }
+        
+        .tab-content {
+            padding: 2rem;
+        }
+        
+        .results-container {
+            min-height: 400px;
+        }
+        
+        /* 기존 중복 스타일 제거 - 위에서 이미 정의된 video-card 스타일 사용 */
+        
+        /* 북마크 기능 스타일 개선 */
+        .bookmarks-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .bookmarks-title {
+            color: var(--dark-card);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .bookmark-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .bookmark-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .bookmark-thumbnail {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .bookmark-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .bookmark-info {
+            flex: 1;
+        }
+        
+        .bookmark-title {
+            font-weight: 600;
+            color: var(--dark-card);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .bookmark-channel {
+            color: var(--gray-text);
+            font-size: 0.8rem;
+        }
+        
+        /* 알림 및 메시지 스타일 */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            box-shadow: 0 4px 16px rgba(220, 53, 69, 0.1);
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1);
+        }
+        
+        /* 툴팁 스타일 */
+        .tooltip-custom {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip-custom::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-card);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .tooltip-custom:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-4px);
+        }
+        
+        /* 푸터 스타일 개선 */
+        .footer-section {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-card) 100%);
+            color: var(--light-text);
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+        
+        .footer-title {
+            color: var(--light-text);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .footer-subtitle {
+            color: var(--light-text);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-subtitle::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 1px;
+        }
+        
+        .footer-description {
+            color: var(--gray-text);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-item {
+            margin-bottom: 1rem;
+            color: var(--gray-text);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-item:hover {
+            color: var(--light-text);
+            transform: translateX(4px);
+        }
+        
+        .contact-item i {
+            color: var(--primary-color);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .contact-item a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .contact-item a:hover {
+            color: var(--primary-color);
+        }
+        
+        .ad-products {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .ad-products li {
+            margin-bottom: 1rem;
+            color: var(--gray-text);
+            font-size: 0.95rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--dark-border);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .ad-products li:hover {
+            color: var(--light-text);
+            transform: translateX(4px);
+        }
+        
+        .ad-products li i {
+            color: var(--primary-color);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .footer-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--dark-border), transparent);
+            margin: 3rem 0 2rem;
+        }
+        
+        .copyright {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+            text-align: center;
+            margin: 0;
+            padding: 1rem 0;
+        }
+        
+        /* 광고 배너 개선 */
+        .ad-banner {
+            background: linear-gradient(135deg, var(--dark-bg), var(--dark-card));
+            color: var(--light-text);
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--dark-border);
+        }
+        
+        .ad-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .ad-banner-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ad-banner h5 {
+            margin: 0 0 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .ad-banner p {
+            margin: 0;
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        /* AdSense 광고 개선 */
+        .adsense-banner {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f1f5f9;
+            position: relative;
+            text-align: center;
+        }
+        
+        .adsense-banner .ad-label {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--gray-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .fallback-ad {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            color: var(--gray-text);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 16px;
+            border: 2px dashed #e2e8f0;
+            margin: 2rem 0;
+        }
+        
+        .fallback-ad h6 {
+            margin-bottom: 0.5rem;
+            color: var(--dark-card);
+            font-weight: 600;
+        }
+        
+        .fallback-ad p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* 개선된 하위 카테고리 토글 */
+        .subcategory-section {
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .subcategory-section.show {
+            display: block;
+        }
+        
+        /* 콘텐츠 영역 스타일 */
+        .content-area {
+            background: white;
+            border-radius: 0 0 20px 20px;
+            min-height: 500px;
+        }
+        
+        /* 스크롤 투 탑 버튼 */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .scroll-to-top:hover {
+            transform: translateY(-4px) scale(1.1);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- 상단 네비게이션 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fab fa-youtube"></i>
+                EduTube Navigator
+            </a>
+            <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
+                <a href="mailto:miriv10@naver.com?subject=광고 문의" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-bullhorn me-2"></i>광고 문의
+                </a>
+                <a href="#" class="profile-icon" title="프로필">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container fade-in">
+            <!-- 검색 헤더 (최상단) -->
+            <div class="search-header">
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <input type="text" class="search-input" id="searchInput" 
+                               placeholder="학습 콘텐츠 검색...">
+                        <button class="search-btn" type="button" id="searchBtn">
+                            <i class="fas fa-search me-2"></i>검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 타이틀 섹션 -->
+            <div class="title-section">
+                <p class="sub-title">빠르고 정확한 학습 콘텐츠 큐레이션</p>
+                
+                <!-- 메인 카테고리 칩 -->
+                <div class="category-chips">
+                    <button class="category-chip" data-category="language">
+                        <i class="fas fa-language me-2"></i>언어 학습
+                    </button>
+                    <button class="category-chip" data-category="programming">
+                        <i class="fas fa-code me-2"></i>프로그래밍
+                    </button>
+                    <button class="category-chip" data-category="hobby">
+                        <i class="fas fa-palette me-2"></i>취미/자격증
+                    </button>
+                </div>
+                
+                <!-- 하위 카테고리 탭 섹션 -->
+                <div class="subcategory-section" id="subcategorySection" style="display: none;">
+                    <!-- 언어 학습 하위 탭 -->
+                    <div class="subcategory-tabs" id="language-tabs" style="display: none;">
+                        <h4 class="subcategory-title"><i class="fas fa-language me-2"></i>언어 학습</h4>
+                        <div class="subcategory-chips">
+                            <button class="subcategory-chip" data-category="language" data-subcategory="english">
+                                <i class="fas fa-flag-usa me-2"></i>영어
+                            </button>
+                            <button class="subcategory-chip" data-category="language" data-subcategory="chinese">
+                                <i class="fas fa-flag me-2"></i>중국어
+                            </button>
+                            <button class="subcategory-chip" data-category="language" data-subcategory="japanese">
+                                <i class="fas fa-torii-gate me-2"></i>일본어
+                            </button>
+                            <button class="subcategory-chip" data-category="language" data-subcategory="other">
+                                <i class="fas fa-globe-americas me-2"></i>기타 언어
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 프로그래밍 하위 탭 -->
+                    <div class="subcategory-tabs" id="programming-tabs" style="display: none;">
+                        <h4 class="subcategory-title"><i class="fas fa-code me-2"></i>프로그래밍</h4>
+                        <div class="subcategory-chips">
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="python">
+                                <i class="fab fa-python me-2"></i>Python
+                            </button>
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="javascript">
+                                <i class="fab fa-js-square me-2"></i>JavaScript
+                            </button>
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="web">
+                                <i class="fas fa-laptop-code me-2"></i>웹개발
+                            </button>
+                            <button class="subcategory-chip" data-category="programming" data-subcategory="data">
+                                <i class="fas fa-chart-bar me-2"></i>데이터분석
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 취미/자격증 하위 탭 -->
+                    <div class="subcategory-tabs" id="hobby-tabs" style="display: none;">
+                        <h4 class="subcategory-title"><i class="fas fa-palette me-2"></i>취미/자격증</h4>
+                        <div class="subcategory-chips">
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="hobby">
+                                <i class="fas fa-heart me-2"></i>취미
+                            </button>
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="certificate">
+                                <i class="fas fa-certificate me-2"></i>자격증
+                            </button>
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="exercise">
+                                <i class="fas fa-dumbbell me-2"></i>운동
+                            </button>
+                            <button class="subcategory-chip" data-category="hobby" data-subcategory="cooking">
+                                <i class="fas fa-utensils me-2"></i>요리
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 필터 섹션 -->
+            <div class="filter-section">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-clock me-1"></i>학습 시간
+                            </label>
+                            <select class="form-select filter-select" id="durationFilter">
+                                <option value="">전체</option>
+                                <option value="short">10분 미만</option>
+                                <option value="medium">10-30분</option>
+                                <option value="long">30분 이상</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-layer-group me-1"></i>난이도
+                            </label>
+                            <select class="form-select filter-select" id="difficultyFilter">
+                                <option value="">전체</option>
+                                <option value="beginner">초급</option>
+                                <option value="intermediate">중급</option>
+                                <option value="advanced">고급</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-sort me-1"></i>정렬
+                            </label>
+                            <select class="form-select filter-select" id="sortFilter">
+                                <option value="viewCount">인기순</option>
+                                <option value="relevance">관련성순</option>
+                                <option value="date">최신순</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-globe me-1"></i>언어
+                            </label>
+                            <select class="form-select filter-select" id="languageFilter">
+                                <option value="ko">한국어</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AdSense 상단 배너 광고 -->
+            <div class="adsense-banner">
+                <div class="ad-label">광고</div>
+                <!-- AdSense 광고 단위 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                     data-ad-slot="YOUR_AD_SLOT_ID"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+                
+                <!-- 대체 광고 (AdSense 승인 전까지 표시) -->
+                <div class="fallback-ad">
+                    <div class="ad-banner-content">
+                        <h5><i class="fas fa-bullhorn me-2"></i>광고 문의: miriv10@naver.com</h5>
+                        <p>교육 콘텐츠 플랫폼에서 효과적인 마케팅을 시작하세요! 맞춤형 광고 솔루션 제공</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 비디오/쇼츠 탭 -->
+            <div class="tab-section">
+                <ul class="nav nav-tabs" id="contentTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="video-tab" data-bs-toggle="tab" data-bs-target="#video-content">
+                            <i class="fas fa-play me-2"></i>Video
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="shorts-tab" data-bs-toggle="tab" data-bs-target="#shorts-content">
+                            <i class="fas fa-mobile-alt me-2"></i>Shorts
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 결과 섹션 -->
+            <div class="results-section">
+                <div class="tab-content" id="contentTabsContent">
+                    <div class="tab-pane fade show active" id="video-content">
+                        <div class="row">
+                            <!-- 메인 콘텐츠 영역 -->
+                            <div class="col-lg-9">
+                                <div id="loadingSpinner" class="loading-spinner d-none">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">검색 중...</span>
+                                    </div>
+                                    <p class="mt-3">최적의 학습 콘텐츠를 찾고 있습니다...</p>
+                                </div>
+                                
+                                <div id="resultsContainer" class="row g-4">
+                                    <!-- 검색 결과가 여기에 표시됩니다 -->
+                                </div>
+                                
+                                <div id="emptyState" class="empty-state">
+                                    <i class="fas fa-search"></i>
+                                    <h4>검색어를 입력하거나 카테고리를 선택해주세요</h4>
+                                    <p>원하는 학습 콘텐츠를 찾아드리겠습니다.</p>
+                                </div>
+                                
+                                <!-- 더보기 버튼 -->
+                                <div id="loadMoreSection" class="load-more-section d-none">
+                                    <button id="loadMoreBtn" class="load-more-btn">
+                                        <i class="fas fa-plus me-2"></i>더보기 (10개 더 보기)
+                                    </button>
+                                </div>
+                                
+                                <!-- 페이지네이션 -->
+                                <div id="paginationSection" class="text-center mt-4 d-none">
+                                    <nav aria-label="검색 결과 페이지네이션">
+                                        <ul class="pagination pagination-lg justify-content-center">
+                                            <li class="page-item" id="prevPage">
+                                                <a class="page-link" href="#" aria-label="이전">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <li class="page-item active" data-page="1">
+                                                <a class="page-link" href="#">1</a>
+                                            </li>
+                                            <li class="page-item" data-page="2">
+                                                <a class="page-link" href="#">2</a>
+                                            </li>
+                                            <li class="page-item" data-page="3">
+                                                <a class="page-link" href="#">3</a>
+                                            </li>
+                                            <li class="page-item" data-page="4">
+                                                <a class="page-link" href="#">4</a>
+                                            </li>
+                                            <li class="page-item" data-page="5">
+                                                <a class="page-link" href="#">5</a>
+                                            </li>
+                                            <li class="page-item" data-page="6">
+                                                <a class="page-link" href="#">6</a>
+                                            </li>
+                                            <li class="page-item" data-page="7">
+                                                <a class="page-link" href="#">7</a>
+                                            </li>
+                                            <li class="page-item" data-page="8">
+                                                <a class="page-link" href="#">8</a>
+                                            </li>
+                                            <li class="page-item" data-page="9">
+                                                <a class="page-link" href="#">9</a>
+                                            </li>
+                                            <li class="page-item" data-page="10">
+                                                <a class="page-link" href="#">10</a>
+                                            </li>
+                                            <li class="page-item" id="nextPage">
+                                                <a class="page-link" href="#" aria-label="다음">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            
+                            <!-- 사이드 광고 영역 -->
+                            <div class="col-lg-3">
+                                <!-- AdSense 사이드바 광고 -->
+                                <div class="adsense-sidebar">
+                                    <div class="ad-label">광고</div>
+                                    <ins class="adsbygoogle"
+                                         style="display:block"
+                                         data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                                         data-ad-slot="YOUR_SIDEBAR_AD_SLOT_ID"
+                                         data-ad-format="rectangle"></ins>
+                                    <script>
+                                         (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script>
+                                    
+                                    <!-- 대체 광고 -->
+                                    <div class="fallback-sidebar-ad">
+                                        <i class="fas fa-bullhorn"></i>
+                                        <h6>광고 문의</h6>
+                                        <p>교육 콘텐츠 타겟 광고<br>효과적인 마케팅 솔루션</p>
+                                        <a href="mailto:miriv10@naver.com?subject=광고 문의" class="btn btn-outline-danger btn-sm mt-2">
+                                            문의하기
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="side-ad">
+                                    <i class="fas fa-star"></i>
+                                    <h6>프리미엄 서비스</h6>
+                                    <p>광고 없는 깔끔한 경험<br>개인화된 추천 서비스</p>
+                                    <a href="mailto:miriv10@naver.com?subject=프리미엄 문의" class="btn btn-outline-danger btn-sm mt-2">
+                                        업그레이드
+                                    </a>
+                                </div>
+                                
+                                <div class="side-ad">
+                                    <i class="fas fa-handshake"></i>
+                                    <h6>콘텐츠 제휴</h6>
+                                    <p>교육 기관 · 강사 협력<br>콘텐츠 큐레이션 파트너십</p>
+                                    <a href="mailto:miriv10@naver.com?subject=제휴 문의" class="btn btn-outline-danger btn-sm mt-2">
+                                        제휴 문의
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="shorts-content">
+                        <div id="shortsContainer" class="row g-4">
+                            <!-- 쇼츠 결과가 여기에 표시됩니다 -->
+                        </div>
+                        
+                        <div id="shortsEmptyState" class="empty-state">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4>1분 이내의 짧은 학습 콘텐츠</h4>
+                            <p>빠르게 학습할 수 있는 쇼츠 영상을 찾아드리겠습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AdSense 푸터 광고 -->
+    <div class="container">
+        <div class="adsense-footer">
+            <div class="ad-label">광고</div>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                 data-ad-slot="YOUR_FOOTER_AD_SLOT_ID"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
+    <!-- 푸터 섹션 추가 -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="footer-title">
+                        <i class="fab fa-youtube me-2"></i>EduTube Navigator
+                    </h5>
+                    <p class="footer-description">
+                        AI 기반 YouTube 학습 콘텐츠 큐레이션 플랫폼<br>
+                        최적의 교육 영상을 빠르고 정확하게 찾아드립니다.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-subtitle">비즈니스 문의</h6>
+                    <div class="business-contact">
+                        <div class="contact-item">
+                            <i class="fas fa-bullhorn me-2"></i>
+                            <strong>광고 문의:</strong> 
+                            <a href="mailto:miriv10@naver.com?subject=광고 문의">miriv10@naver.com</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-handshake me-2"></i>
+                            <strong>제휴 문의:</strong> 
+                            <a href="mailto:miriv10@naver.com?subject=제휴 문의">miriv10@naver.com</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-subtitle">광고 상품</h6>
+                    <ul class="ad-products">
+                        <li><i class="fas fa-rectangle-ad me-2"></i>배너 광고</li>
+                        <li><i class="fas fa-star me-2"></i>스폰서드 콘텐츠</li>
+                        <li><i class="fas fa-link me-2"></i>제휴 마케팅</li>
+                        <li><i class="fas fa-chart-line me-2"></i>맞춤형 광고 솔루션</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-divider">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="copyright">
+                        © 2025 EduTube Navigator. All rights reserved. | 
+                        한국어 교육 콘텐츠 전문 플랫폼
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentQuery = '';
+        let currentCategory = '';
+        let currentSubcategory = '';
+        let currentNextPageToken = null;
+        let isLoading = false;
+        let bookmarkedVideos = JSON.parse(localStorage.getItem('bookmarkedVideos') || '[]');
+        
+        // 페이지네이션 관련 변수
+        let allVideos = []; // 전체 영상 데이터
+        let currentPage = 1;
+        let videosPerPage = 4;
+        let totalPages = 0;
+        
+        // 북마크 상태 확인
+        function isBookmarked(videoId) {
+            return bookmarkedVideos.includes(videoId);
+        }
+        
+        // 북마크 토글
+        function toggleBookmark(videoId) {
+            const index = bookmarkedVideos.indexOf(videoId);
+            if (index > -1) {
+                bookmarkedVideos.splice(index, 1);
+            } else {
+                bookmarkedVideos.push(videoId);
+            }
+            localStorage.setItem('bookmarkedVideos', JSON.stringify(bookmarkedVideos));
+            
+            // UI 업데이트
+            const bookmarkBtn = document.querySelector(`[data-video-id="${videoId}"]`);
+            if (bookmarkBtn) {
+                bookmarkBtn.classList.toggle('bookmarked');
+                bookmarkBtn.innerHTML = isBookmarked(videoId) ? 
+                    '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            }
+        }
+        
+        // 하위 카테고리 탭 표시/숨김
+        function showSubcategoryTabs(category) {
+            // 모든 하위 탭 숨김
+            document.querySelectorAll('.subcategory-tabs').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // 선택된 카테고리의 하위 탭 표시
+            const targetTab = document.getElementById(`${category}-tabs`);
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                document.getElementById('subcategorySection').style.display = 'block';
+            }
+        }
+        
+        // 하위 카테고리 탭 숨김
+        function hideSubcategoryTabs() {
+            document.getElementById('subcategorySection').style.display = 'none';
+            // 모든 하위 카테고리 비활성화
+            document.querySelectorAll('.subcategory-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+        }
+        
+        // 검색 실행
+        function performSearch(loadMore = false) {
+            if (isLoading) return;
+            
+            const query = document.getElementById('searchInput').value.trim();
+            const duration = document.getElementById('durationFilter').value;
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const sortOrder = document.getElementById('sortFilter').value;
+            const language = document.getElementById('languageFilter').value;
+            const activeTab = document.querySelector('.nav-link.active').id;
+            const isShorts = activeTab === 'shorts-tab';
+            
+            isLoading = true;
+            
+            // 새 검색인 경우 페이지 토큰 초기화
+            if (!loadMore) {
+                currentNextPageToken = null;
+                const container = isShorts ? document.getElementById('shortsContainer') : document.getElementById('resultsContainer');
+                container.innerHTML = '';
+            }
+            
+            // 로딩 스피너 표시
+            if (!loadMore) {
+                document.getElementById('loadingSpinner').classList.remove('d-none');
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('shortsEmptyState').style.display = 'none';
+                document.getElementById('loadMoreSection').classList.add('d-none');
+            } else {
+                document.getElementById('loadMoreBtn').disabled = true;
+                document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>로딩 중...';
+            }
+            
+            const searchData = {
+                query: query || currentQuery,
+                category: currentCategory,
+                subcategory: currentSubcategory,
+                duration: isShorts ? 'short' : duration,
+                difficulty: difficulty,
+                sortOrder: sortOrder,
+                language: language,
+                is_shorts: isShorts,
+                pageToken: loadMore ? currentNextPageToken : null
+            };
+            
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(searchData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                isLoading = false;
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('loadMoreBtn').disabled = false;
+                document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-plus me-2"></i>더보기 (10개 더 보기)';
+                
+                if (data.success) {
+                    currentNextPageToken = data.nextPageToken;
+                    displayResults(data.videos, isShorts, loadMore);
+                    
+                    // 더보기 버튼 표시/숨김
+                    if (data.nextPageToken && data.videos.length > 0) {
+                        document.getElementById('loadMoreSection').classList.remove('d-none');
+                    } else {
+                        document.getElementById('loadMoreSection').classList.add('d-none');
+                    }
+                } else {
+                    console.error('검색 실패:', data.error);
+                    displayError('검색 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                isLoading = false;
+                document.getElementById('loadingSpinner').classList.add('d-none');
+                document.getElementById('loadMoreBtn').disabled = false;
+                document.getElementById('loadMoreBtn').innerHTML = '<i class="fas fa-plus me-2"></i>더보기 (10개 더 보기)';
+                console.error('검색 오류:', error);
+                displayError('네트워크 오류가 발생했습니다.');
+            });
+        }
+        
+        // 결과 표시
+        function displayResults(videos, isShorts = false, append = false) {
+            const containerId = isShorts ? 'shortsContainer' : 'resultsContainer';
+            const emptyStateId = isShorts ? 'shortsEmptyState' : 'emptyState';
+            const container = document.getElementById(containerId);
+            const emptyState = document.getElementById(emptyStateId);
+            
+            if (!videos || videos.length === 0) {
+                if (!append) {
+                    container.innerHTML = '';
+                    emptyState.style.display = 'block';
+                    document.getElementById('paginationSection').classList.add('d-none');
+                }
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // 전체 영상 데이터 저장 (새 검색인 경우)
+            if (!append) {
+                allVideos = videos;
+                currentPage = 1;
+                totalPages = Math.ceil(videos.length / videosPerPage);
+                displayCurrentPage();
+                setupPagination();
+            } else {
+                // 더 많은 영상이 추가된 경우
+                allVideos = allVideos.concat(videos);
+                totalPages = Math.ceil(allVideos.length / videosPerPage);
+                setupPagination();
+            }
+        }
+        
+        // 현재 페이지의 영상들만 표시
+        function displayCurrentPage() {
+            const activeTab = document.querySelector('.nav-link.active').id;
+            const isShorts = activeTab === 'shorts-tab';
+            const containerId = isShorts ? 'shortsContainer' : 'resultsContainer';
+            const container = document.getElementById(containerId);
+            
+            const startIndex = (currentPage - 1) * videosPerPage;
+            const endIndex = startIndex + videosPerPage;
+            const pageVideos = allVideos.slice(startIndex, endIndex);
+            
+            if (pageVideos.length === 0) {
+                container.innerHTML = '<div class="col-12"><p class="text-center text-muted">이 페이지에는 영상이 없습니다.</p></div>';
+                return;
+            }
+            
+            const videosHTML = pageVideos.map((video, index) => `
+                <div class="col-lg-12 col-md-12 slide-up" style="animation-delay: ${index * 0.1}s;">
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+                            <div class="duration-badge">${video.duration}</div>
+                            <button class="bookmark-btn ${isBookmarked(video.videoId) ? 'bookmarked' : ''}" 
+                                    data-video-id="${video.videoId}" onclick="toggleBookmark('${video.videoId}')">
+                                <i class="${isBookmarked(video.videoId) ? 'fas' : 'far'} fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">
+                                <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">${video.title}</a>
+                            </h3>
+                            <p class="video-channel">
+                                <i class="fas fa-user-circle me-2"></i>${video.channelTitle}
+                            </p>
+                            <div class="video-meta">
+                                <span><i class="fas fa-eye me-1"></i>조회수 ${video.viewCount?.toLocaleString() || '정보 없음'}</span>
+                                <span><i class="fas fa-calendar me-1"></i>${video.publishedAt}</span>
+                            </div>
+                            ${video.description ? `<p class="video-description">${video.description}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = videosHTML;
+        }
+        
+        // 페이지네이션 설정
+        function setupPagination() {
+            const paginationSection = document.getElementById('paginationSection');
+            
+            if (totalPages <= 1) {
+                paginationSection.classList.add('d-none');
+                document.getElementById('loadMoreSection').classList.add('d-none');
+                return;
+            }
+            
+            // 더보기 버튼 숨기고 페이지네이션 표시
+            document.getElementById('loadMoreSection').classList.add('d-none');
+            paginationSection.classList.remove('d-none');
+            
+            // 페이지 번호 버튼들 업데이트
+            const pageItems = document.querySelectorAll('.pagination .page-item[data-page]');
+            pageItems.forEach(item => {
+                const pageNum = parseInt(item.dataset.page);
+                if (pageNum <= totalPages) {
+                    item.style.display = 'block';
+                    item.classList.toggle('active', pageNum === currentPage);
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // 이전/다음 버튼 상태 업데이트
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            
+            prevBtn.classList.toggle('disabled', currentPage === 1);
+            nextBtn.classList.toggle('disabled', currentPage === totalPages);
+        }
+        
+        // 페이지 변경
+        function changePage(newPage) {
+            if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+            
+            currentPage = newPage;
+            displayCurrentPage();
+            setupPagination();
+            
+            // 페이지 변경 시 스크롤을 결과 섹션으로 이동
+            document.getElementById('resultsContainer').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // 이벤트 리스너
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            currentQuery = document.getElementById('searchInput').value.trim();
+            currentCategory = '';
+            currentSubcategory = '';
+            // 카테고리 활성화 해제
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.subcategory-chip').forEach(c => c.classList.remove('active'));
+            hideSubcategoryTabs();
+            performSearch();
+        });
+        
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                currentQuery = e.target.value.trim();
+                currentCategory = '';
+                currentSubcategory = '';
+                // 카테고리 활성화 해제
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.subcategory-chip').forEach(c => c.classList.remove('active'));
+                hideSubcategoryTabs();
+                performSearch();
+            }
+        });
+        
+        // 더보기 버튼 클릭
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            performSearch(true);
+        });
+        
+        // 메인 카테고리 칩 클릭
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                // 기존 active 클래스 제거
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.subcategory-chip').forEach(c => c.classList.remove('active'));
+                
+                chip.classList.add('active');
+                
+                const category = chip.dataset.category;
+                currentCategory = category;
+                currentSubcategory = '';
+                currentQuery = '';
+                document.getElementById('searchInput').value = '';
+                
+                // 하위 카테고리 탭 표시
+                showSubcategoryTabs(category);
+            });
+        });
+        
+        // 하위 카테고리 칩 클릭 (이벤트 위임 사용)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('subcategory-chip') || e.target.closest('.subcategory-chip')) {
+                const chip = e.target.classList.contains('subcategory-chip') ? e.target : e.target.closest('.subcategory-chip');
+                
+                // 같은 카테고리 내 다른 하위 카테고리 비활성화
+                const category = chip.dataset.category;
+                document.querySelectorAll(`.subcategory-chip[data-category="${category}"]`).forEach(c => {
+                    c.classList.remove('active');
+                });
+                
+                chip.classList.add('active');
+                
+                currentCategory = chip.dataset.category;
+                currentSubcategory = chip.dataset.subcategory;
+                currentQuery = '';
+                document.getElementById('searchInput').value = '';
+                
+                performSearch();
+            }
+        });
+        
+        // 필터 변경 시 자동 검색
+        ['durationFilter', 'difficultyFilter', 'sortFilter', 'languageFilter'].forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', () => {
+                if (currentQuery || currentCategory) {
+                    performSearch();
+                }
+            });
+        });
+        
+        // 탭 변경 시 검색 재실행
+        document.getElementById('contentTabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-link')) {
+                setTimeout(() => {
+                    if (currentQuery || currentCategory) {
+                        performSearch();
+                    }
+                }, 100);
+            }
+        });
+        
+        // 페이지 로드 시 초기화 - 한국어 교육 콘텐츠 표시
+        document.addEventListener('DOMContentLoaded', () => {
+            // 프로그래밍 카테고리를 기본으로 설정
+            currentCategory = 'programming';
+            document.querySelector('[data-category="programming"]').classList.add('active');
+            showSubcategoryTabs('programming');
+            // 한국어와 인기순으로 기본 설정
+            document.getElementById('languageFilter').value = 'ko';
+            document.getElementById('sortFilter').value = 'viewCount';
+            // 기본 검색 실행
+            performSearch();
+        });
+        
+        // 오류 표시
+        function displayError(message) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${message}
+                    </div>
+                </div>
+            `;
+            document.getElementById('loadMoreSection').classList.add('d-none');
+            document.getElementById('paginationSection').classList.add('d-none');
+        }
+        
+        // 페이지네이션 버튼 클릭 이벤트
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.pagination .page-item')) {
+                e.preventDefault();
+                const pageItem = e.target.closest('.page-item');
+                
+                if (pageItem.classList.contains('disabled')) return;
+                
+                if (pageItem.id === 'prevPage') {
+                    changePage(currentPage - 1);
+                } else if (pageItem.id === 'nextPage') {
+                    changePage(currentPage + 1);
+                } else if (pageItem.dataset.page) {
+                    changePage(parseInt(pageItem.dataset.page));
+                }
+            }
+        });
+        
+        // 스크롤 투 탑 버튼 기능
+        const scrollToTopBtn = document.createElement('button');
+        scrollToTopBtn.className = 'scroll-to-top';
+        scrollToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        scrollToTopBtn.setAttribute('title', '맨 위로');
+        document.body.appendChild(scrollToTopBtn);
+        
+        // 스크롤 이벤트 리스너
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+        
+        // 스크롤 투 탑 버튼 클릭 이벤트
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html> 

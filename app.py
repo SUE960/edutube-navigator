@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 from flask import Flask, render_template, request, jsonify
+=======
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, Video, SearchHistory, User, UserFavorite
+>>>>>>> ffee8f7 (0615 배포)
 import json
 import re
 import os
@@ -7,6 +15,11 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import isodate
 from datetime import datetime
+<<<<<<< HEAD
+=======
+import redis
+from celery import Celery
+>>>>>>> ffee8f7 (0615 배포)
 
 load_dotenv()
 
@@ -40,6 +53,42 @@ IS_PRODUCTION = os.getenv('VERCEL') or os.getenv('RAILWAY_ENVIRONMENT') or os.ge
 _llm_model = None
 _youtube = None
 
+<<<<<<< HEAD
+=======
+# 환경변수 설정
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-for-production')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///edutube.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Redis 설정
+redis_client = redis.Redis(
+    host=os.getenv('REDIS_HOST', 'localhost'),
+    port=int(os.getenv('REDIS_PORT', 6379)),
+    password=os.getenv('REDIS_PASSWORD', None),
+    db=0
+)
+
+# Celery 설정
+celery = Celery(
+    'edutube',
+    broker=os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
+    backend=os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+)
+
+# 데이터베이스 초기화
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# 로그인 매니저 설정
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+>>>>>>> ffee8f7 (0615 배포)
 def get_youtube_service():
     global _youtube
     if _youtube is None:
@@ -362,19 +411,53 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         }
         
         if category in subcategory_queries and subcategory in subcategory_queries[category]:
+<<<<<<< HEAD
             if is_shorts:
                 query = subcategory_queries[category][subcategory].replace("강의 기초 입문 튜토리얼 배우기 공부", "팁 꿀팁")
             else:
                 query = subcategory_queries[category][subcategory] + " 강의 입문 기초 튜토리얼"
             sortOrder = 'viewCount'  # 인기순
             print(f"하위 카테고리 검색어 적용: {query}")
+=======
+            base_query = subcategory_queries[category][subcategory]
+            
+            # 난이도별 검색어 차별화
+            if difficulty == 'beginner':
+                if is_shorts:
+                    query = base_query + " 초보 기초 입문 팁"
+                else:
+                    query = base_query + " 초보자 기초 입문 처음 시작 쉽게 배우기"
+            elif difficulty == 'intermediate':
+                if is_shorts:
+                    query = base_query + " 중급 심화 활용 팁"
+                else:
+                    query = base_query + " 중급 실무 활용 심화 프로젝트 응용"
+            elif difficulty == 'advanced':
+                if is_shorts:
+                    query = base_query + " 고급 전문 마스터 팁"
+                else:
+                    query = base_query + " 고급 전문가 마스터 완전정복 심화과정"
+            else:
+                if is_shorts:
+                    query = base_query.replace("강의 기초 입문 튜토리얼 배우기 공부", "팁 꿀팁")
+                else:
+                    query = base_query + " 강의 입문 기초 튜토리얼"
+            
+            sortOrder = 'viewCount'  # 인기순
+            print(f"하위 카테고리 검색어 적용 (난이도: {difficulty}): {query}")
+>>>>>>> ffee8f7 (0615 배포)
     
     # 카테고리별 한국어 검색 키워드 강화 (하위 카테고리가 없는 경우)
     elif category and not subcategory and language == 'ko':
         if is_shorts:
             category_korean_queries = {
+<<<<<<< HEAD
                 'programming': "프로그래밍 코딩 개발 파이썬 자바스크립트 웹개발 팁",
                 'language': "영어 일본어 중국어 언어 회화 발음 팁",
+=======
+                'programming': "프로그래밍 코딩 개발 파이썬 자바스크립트 웹개발",
+                'language': "영어 일본어 중국어 언어 회화 발음",
+>>>>>>> ffee8f7 (0615 배포)
                 'hobby': "취미 요리 운동 그림 DIY"
             }
         else:
@@ -383,9 +466,37 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 'language': "영어 배우기 일본어 중국어 언어 학습 회화 문법 발음 어학 TOEIC IELTS 외국어",
                 'hobby': "요리 배우기 그림 그리기 운동 입문 취미 활동 DIY 만들기 handmade 배우는"
             }
+<<<<<<< HEAD
         if category in category_korean_queries:
             query = category_korean_queries[category]
             sortOrder = 'viewCount'  # 인기순
+=======
+        
+        if category in category_korean_queries:
+            base_query = category_korean_queries[category]
+            
+            # 난이도별 검색어 차별화
+            if difficulty == 'beginner':
+                if is_shorts:
+                    query = base_query + " 초보 기초 입문 팁"
+                else:
+                    query = base_query + " 초보자 기초 입문 처음 시작 쉽게"
+            elif difficulty == 'intermediate':
+                if is_shorts:
+                    query = base_query + " 중급 심화 활용 팁"
+                else:
+                    query = base_query + " 중급 실무 활용 심화 프로젝트"
+            elif difficulty == 'advanced':
+                if is_shorts:
+                    query = base_query + " 고급 전문 마스터 팁"
+                else:
+                    query = base_query + " 고급 전문가 마스터 완전정복"
+            else:
+                query = base_query
+            
+            sortOrder = 'viewCount'  # 인기순
+            print(f"카테고리 검색어 적용 (난이도: {difficulty}): {query}")
+>>>>>>> ffee8f7 (0615 배포)
     
     # 카테고리 문자열을 YouTube 숫자 ID로 매핑 - 제한 완화
     category_mapping = {
@@ -397,6 +508,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     # 모든 카테고리에서 제한을 완화하여 더 많은 결과 확보
     youtube_category_id = None
     
+<<<<<<< HEAD
     # 배포 환경에서 안정성을 위해 카테고리 ID 완전 제거
     # Shorts의 경우 카테고리 제한을 완화 (더 많은 결과를 위해)
     # if is_shorts:
@@ -404,6 +516,8 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     # else:
     #     youtube_category_id = category_mapping.get(category, '27')  # 기본값을 교육으로
     
+=======
+>>>>>>> ffee8f7 (0615 배포)
     # 기본 검색 파라미터
     search_params = {
         'q': query,
@@ -691,6 +805,7 @@ def analyze():
 
 @app.route('/search', methods=['POST'])
 def search():
+<<<<<<< HEAD
     data = request.json
     query = data.get('query', '')
     category = data.get('category')
@@ -729,6 +844,42 @@ def search():
         "videos": result['videos'],
         "nextPageToken": result['nextPageToken']
     })
+=======
+    query = request.form.get('query', '')
+    category = request.form.get('category')
+    subcategory = request.form.get('subcategory')
+    page = int(request.form.get('page', 1))
+    
+    # 캐시 확인
+    cache_key = f"search:{query}:{category}:{subcategory}:{page}"
+    cached_results = redis_client.get(cache_key)
+    
+    if cached_results:
+        return jsonify(json.loads(cached_results))
+    
+    # YouTube API 검색
+    results = search_youtube_videos(
+        query=query,
+        category=category,
+        subcategory=subcategory,
+        page_token=None if page == 1 else f"page_{page}"
+    )
+    
+    # 검색 결과 캐싱
+    cache_search_results.delay(query, category, subcategory, results)
+    
+    # 검색 기록 저장
+    if current_user.is_authenticated:
+        history = SearchHistory(
+            query=query,
+            category=category,
+            subcategory=subcategory
+        )
+        db.session.add(history)
+        db.session.commit()
+    
+    return jsonify(results)
+>>>>>>> ffee8f7 (0615 배포)
 
 @app.route('/categories')
 def get_categories():
@@ -748,9 +899,90 @@ def get_categories():
     }
     return jsonify(categories)
 
+<<<<<<< HEAD
 if __name__ == '__main__':
     # 로컬 개발용
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5005)), debug=False)
 else:
     # Vercel 배포용 - 이 부분이 중요!
     app.debug = False
+=======
+# 사용자 인증 관련 라우트
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if User.query.filter_by(email=email).first():
+            flash('이미 등록된 이메일입니다.')
+            return redirect(url_for('register'))
+        
+        user = User(
+            email=email,
+            password_hash=generate_password_hash(password)
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('회원가입이 완료되었습니다.')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+            return redirect(url_for('index'))
+        
+        flash('이메일 또는 비밀번호가 올바르지 않습니다.')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+# 즐겨찾기 관련 라우트
+@app.route('/favorite/<video_id>', methods=['POST'])
+@login_required
+def toggle_favorite(video_id):
+    favorite = UserFavorite.query.filter_by(
+        user_id=current_user.id,
+        video_id=video_id
+    ).first()
+    
+    if favorite:
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({'status': 'removed'})
+    else:
+        favorite = UserFavorite(
+            user_id=current_user.id,
+            video_id=video_id
+        )
+        db.session.add(favorite)
+        db.session.commit()
+        return jsonify({'status': 'added'})
+
+@app.route('/favorites')
+@login_required
+def favorites():
+    favorites = UserFavorite.query.filter_by(user_id=current_user.id).all()
+    return render_template('favorites.html', favorites=favorites)
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
+>>>>>>> ffee8f7 (0615 배포)
