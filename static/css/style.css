@@ -1,3 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+body {
+  position: relative;
+  width: 393px;
+  height: 852px;
+  background: #F0F0F0;
+  margin: 0 auto;
+  font-family: 'Inter', 'Pretendard', sans-serif;
+}
+
+.logo {
+  position: absolute;
+  width: 319px;
+  height: 30px;
+  left: 74px;
+  top: 32px;
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-size: 25px;
+  line-height: 30px;
+  color: #000;
+  text-align: center;
+}
+
+.search-container {
+  position: absolute;
+  width: 336px;
+  height: 37px;
+  left: 30px;
+  top: 107px;
+  background: #fff;
+  box-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding-left: 13px;
+}
+
+.search-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: rgba(0,0,0,0.5);
+  width: 90%;
+  background: transparent;
+}
+
+.category-row {
+  position: absolute;
+  top: 167px;
+  left: 24px;
+  display: flex;
+  gap: 10px;
+}
+
+.category-btn {
+  height: 30px;
+  padding: 0 18px;
+  border-radius: 20px;
+  box-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+  font-size: 15px;
+  line-height: 18px;
+  font-family: 'Inter';
+  font-weight: 400;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  background: #fff;
+  color: #000;
+}
+.category-btn.active {
+  background: #D86557;
+  color: #fff;
+}
+
+.subcategory-row {
+  position: absolute;
+  top: 208px;
+  left: 24px;
+  display: flex;
+  gap: 10px;
+}
+
+.subcategory-btn {
+  height: 30px;
+  padding: 0 18px;
+  border-radius: 20px;
+  box-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+  font-size: 15px;
+  line-height: 18px;
+  font-family: 'Inter';
+  font-weight: 400;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  background: #fff;
+  color: #000;
+}
+
+.language-tabs {
+  position: absolute;
+  top: 140px;
+  left: 24px;
+  display: flex;
+  gap: 20px;
+}
+.language-tab {
+  font-size: 15px;
+  color: #000;
+  opacity: 0.5;
+  font-family: 'Inter';
+  font-weight: 400;
+}
+.language-tab.active {
+  opacity: 1;
+}
+
+.recommend-row {
+  position: absolute;
+  top: 120px;
+  left: 24px;
+  display: flex;
+  gap: 10px;
+}
+.recommend-btn {
+  font-size: 10px;
+  color: #000;
+  text-decoration: underline;
+  font-family: 'Inter';
+  font-weight: 400;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.video-list {
+  position: absolute;
+  top: 319px;
+  left: 24px;
+  width: 345px;
+}
+.video-item {
+  display: flex;
+  margin-bottom: 12px;
+}
+.video-thumb {
+  width: 162px;
+  height: 102px;
+  background: #D9D9D9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-style: italic;
+  color: #000;
+}
+.video-info {
+  margin-left: 10px;
+  width: 158px;
+}
+.video-title {
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 2px;
+}
+.channel-name {
+  font-size: 12px;
+  font-style: italic;
+  color: #000;
+  margin-bottom: 2px;
+}
+.summary {
+  font-size: 10px;
+  font-style: italic;
+  color: #000;
+  opacity: 0.5;
+}
+
+.pagination {
+  position: absolute;
+  width: 64px;
+  height: 14px;
+  left: calc(50% - 32px);
+  top: 797px;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+.page-number {
+  font-size: 10px;
+  color: #000;
+  opacity: 0.5;
+}
+.page-number.active {
+  opacity: 1;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5,7 +213,6 @@
 }
 
 body {
-    font-family: 'Noto Sans KR', sans-serif;
     line-height: 1.6;
     background-color: #f5f5f5;
     color: #333;
