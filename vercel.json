@@ -13,14 +13,10 @@
     }
   ],
   "env": {
-<<<<<<< HEAD
-    "FLASK_ENV": "production"
-=======
     "FLASK_ENV": "production",
     "YOUTUBE_API_KEY": "@youtube_api_key",
     "SECRET_KEY": "@secret_key",
     "ADSENSE_PUBLISHER_ID": "@adsense_publisher_id",
     "GA_MEASUREMENT_ID": "@ga_measurement_id"
->>>>>>> ffee8f7 (0615 배포)
   }
-} 
+}
