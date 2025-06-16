@@ -5,7 +5,5 @@ google-api-python-client==2.118.0
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0
 isodate==0.6.1
-<<<<<<< HEAD
 gunicorn
-=======
->>>>>>> 2a7afca19de3b911a62054bcac9aaea13fe14753
+
