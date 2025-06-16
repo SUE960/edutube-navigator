@@ -25,10 +25,13 @@ body {
 }
 
 .main-container {
-    max-width: 1200px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2rem 1rem;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .logo {
@@ -37,17 +40,13 @@ body {
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 .search-container {
-    background: var(--card-background);
-    border-radius: var(--border-radius);
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 400px;
     margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
 }
 
 .search-container:focus-within {
@@ -67,11 +66,10 @@ body {
     background: transparent;
 }
 
-.category-row, .subcategory-row {
-    display: flex;
-    gap: 0.75rem;
+.category-row, .subcategory-row, .recommend-row {
+    width: 100%;
+    justify-content: center;
     margin-bottom: 1rem;
-    flex-wrap: wrap;
 }
 
 .category-btn, .subcategory-btn {
@@ -97,12 +95,6 @@ body {
     color: white;
 }
 
-.recommend-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
 .recommend-btn {
     background: none;
     border: none;
@@ -123,9 +115,7 @@ body {
 }
 
 .video-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    width: 100%;
     margin-top: 2rem;
 }
 
@@ -228,9 +218,8 @@ body {
 }
 
 .pagination {
-    display: flex;
+    width: 100%;
     justify-content: center;
-    gap: 0.5rem;
     margin-top: 2rem;
 }
 
@@ -254,7 +243,10 @@ body {
 
 @media (max-width: 768px) {
     .main-container {
-        padding: 1rem;
+        padding: 1rem 0.5rem;
+    }
+    .search-container {
+        max-width: 100%;
     }
 
     .video-list {
@@ -274,7 +266,7 @@ body {
 
 /* 햄버거 메뉴 스타일 */
 .menu-btn {
-    position: fixed;
+    position: absolute;
     top: 1rem;
     left: 1rem;
     background: none;
