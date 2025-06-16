@@ -66,13 +66,21 @@ body {
     background: transparent;
 }
 
-.category-row, .subcategory-row, .recommend-row {
-    width: 100%;
+/* ✅ 버튼 정렬 관련 수정 */
+.category-row,
+.subcategory-row,
+.recommend-row,
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     justify-content: center;
+    align-items: center;
     margin-bottom: 1rem;
 }
 
-.category-btn, .subcategory-btn {
+.category-btn,
+.subcategory-btn {
     padding: 0.5rem 1.25rem;
     border-radius: 20px;
     border: none;
@@ -85,12 +93,14 @@ body {
     box-shadow: var(--shadow);
 }
 
-.category-btn:hover, .subcategory-btn:hover {
+.category-btn:hover,
+.subcategory-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.category-btn.active, .subcategory-btn.active {
+.category-btn.active,
+.subcategory-btn.active {
     background: var(--primary-color);
     color: white;
 }
@@ -217,12 +227,6 @@ body {
     color: #999;
 }
 
-.pagination {
-    width: 100%;
-    justify-content: center;
-    margin-top: 2rem;
-}
-
 .page-number {
     padding: 0.5rem 1rem;
     border: none;
@@ -241,10 +245,12 @@ body {
     color: white;
 }
 
+/* 반응형 대응 */
 @media (max-width: 768px) {
     .main-container {
         padding: 1rem 0.5rem;
     }
+
     .search-container {
         max-width: 100%;
     }
@@ -253,13 +259,15 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .category-row, .subcategory-row {
+    .category-row,
+    .subcategory-row {
         overflow-x: auto;
         padding-bottom: 0.5rem;
         -webkit-overflow-scrolling: touch;
     }
 
-    .category-btn, .subcategory-btn {
+    .category-btn,
+    .subcategory-btn {
         white-space: nowrap;
     }
 }
@@ -282,4 +290,4 @@ body {
 
 .menu-btn:hover {
     background-color: rgba(0, 0, 0, 0.05);
-} 
+}
