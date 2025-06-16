@@ -5,16 +5,3 @@ google-api-python-client==2.118.0
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0
 isodate==0.6.1
-<<<<<<< HEAD
-=======
-Flask-SQLAlchemy==3.1.1
-Flask-Login==0.6.3
-Flask-WTF==1.2.1
-Flask-Migrate==4.0.5
-Werkzeug==3.0.1
-email-validator==2.1.0.post1
-redis==5.0.1
-celery==5.3.6
-gunicorn==21.2.0
-psycopg2-binary==2.9.9
->>>>>>> ffee8f7 (0615 배포)
