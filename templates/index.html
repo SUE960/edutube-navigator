@@ -69,6 +69,7 @@
         let currentSubcategory = 'english';
         let currentPage = 1;
         let isLoading = false;
+        let currentSortOrder = 'viewCount';
         const categoryData = {
             language: ['영어', '중국어', '일본어'],
             programming: ['Python', 'JavaScript', '웹개발', '데이터분석'],
@@ -118,14 +119,15 @@
             document.getElementById('emptyState').style.display = 'none';
             const searchQuery = document.getElementById('searchInput').value.trim();
             const formData = new FormData();
-            formData.append('query', searchQuery || '파이썬');
+            formData.append('query', searchQuery || '');
             formData.append('category', currentCategory);
             formData.append('subcategory', currentSubcategory);
             formData.append('page', currentPage);
+            formData.append('sortOrder', currentSortOrder);
             fetch('/search', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
-                if (data.success && data.videos && data.videos.length > 0) {
+                if (data.success !== false && data.videos && data.videos.length > 0) {
                     displayResults(data.videos);
                 } else {
                     showEmptyState();
@@ -178,6 +180,9 @@
         });
         document.addEventListener('DOMContentLoaded', function() {
             updateSubcategories('language');
+            currentCategory = 'language';
+            currentSubcategory = 'english';
+            currentSortOrder = 'viewCount';
             performSearch();
         });
     </script>
