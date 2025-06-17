@@ -39,6 +39,11 @@
             <button class="recommend-btn active" data-filter="recommend">추천순</button>
             <button class="recommend-btn" data-filter="korean">한국어</button>
         </div>
+        <!-- 언어 토글 버튼 -->
+        <div class="lang-toggle-row" style="display:flex; justify-content:center; margin-bottom:1rem; gap:10px;">
+            <button class="lang-toggle-btn active" data-lang="ko">한국어</button>
+            <button class="lang-toggle-btn" data-lang="en">영어</button>
+        </div>
         <!-- 비디오 리스트 -->
         <div class="video-list" id="videoList">
             <!-- 비디오 카드들이 여기에 동적으로 추가됩니다 -->
@@ -70,6 +75,7 @@
         let currentPage = 1;
         let isLoading = false;
         let currentSortOrder = 'viewCount';
+        let currentLang = 'ko';
         const categoryData = {
             language: ['영어', '중국어', '일본어'],
             programming: ['Python', 'JavaScript', '웹개발', '데이터분석'],
@@ -112,6 +118,16 @@
                 performSearch();
             });
         });
+        // 언어 토글 버튼 이벤트
+        const langBtns = document.querySelectorAll('.lang-toggle-btn');
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                langBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentLang = this.dataset.lang;
+                performSearch();
+            });
+        });
         function performSearch() {
             if (isLoading) return;
             isLoading = true;
@@ -124,6 +140,7 @@
             formData.append('subcategory', currentSubcategory);
             formData.append('page', currentPage);
             formData.append('sortOrder', currentSortOrder);
+            formData.append('language', currentLang);
             fetch('/search', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
