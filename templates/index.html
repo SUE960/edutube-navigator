@@ -34,15 +34,10 @@
             <button class="subcategory-btn" data-subcategory="chinese">중국어</button>
             <button class="subcategory-btn" data-subcategory="japanese">일본어</button>
         </div>
-        <!-- 추천/한국어 필터 -->
-        <div class="recommend-row">
-            <button class="recommend-btn active" data-filter="recommend">추천순</button>
-            <button class="recommend-btn" data-filter="korean">한국어</button>
-        </div>
-        <!-- 언어 토글 버튼 -->
-        <div class="lang-toggle-row" style="display:flex; justify-content:center; margin-bottom:1rem; gap:10px;">
-            <button class="lang-toggle-btn active" data-lang="ko">한국어</button>
-            <button class="lang-toggle-btn" data-lang="en">영어</button>
+        <!-- 영상 언어 선택 버튼 추가 -->
+        <div class="video-lang-row" style="display:flex; justify-content:center; margin-bottom:1rem; gap:10px;">
+            <button class="video-lang-btn active" data-lang="ko">한국어</button>
+            <button class="video-lang-btn" data-lang="en">영어</button>
         </div>
         <!-- 비디오 리스트 -->
         <div class="video-list" id="videoList">
@@ -111,18 +106,11 @@
             });
             if (items.length > 0) currentSubcategory = items[0].toLowerCase();
         }
-        document.querySelectorAll('.recommend-btn').forEach(btn => {
+        // 영상 언어 버튼 이벤트
+        const videoLangBtns = document.querySelectorAll('.video-lang-btn');
+        videoLangBtns.forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('.recommend-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                performSearch();
-            });
-        });
-        // 언어 토글 버튼 이벤트
-        const langBtns = document.querySelectorAll('.lang-toggle-btn');
-        langBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                langBtns.forEach(b => b.classList.remove('active'));
+                videoLangBtns.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentLang = this.dataset.lang;
                 performSearch();
