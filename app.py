@@ -113,6 +113,18 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     if youtube is None:
         print("❌ YouTube 서비스를 사용할 수 없습니다.")
         return {'videos': [], 'nextPageToken': None}
+    
+    # 카테고리/서브카테고리에 따른 기본 검색어 설정
+    if not query:
+        if category == 'language' and subcategory == 'english':
+            query = '영어 회화 문법' if language == 'ko' else 'english tutorial grammar'
+        elif category == 'programming':
+            query = '프로그래밍 강의' if language == 'ko' else 'programming tutorial'
+        elif category == 'hobby':
+            query = '취미 배우기' if language == 'ko' else 'hobby tutorial'
+        else:
+            query = '교육 강의' if language == 'ko' else 'education tutorial'
+    
     original_query = query
     if query and len(query) > 15:
         query = simplify_search_query(query)
@@ -130,9 +142,9 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         search_params['regionCode'] = 'KR'
         search_params['relevanceLanguage'] = 'ko'
         print(f"한국어 지역/언어 필터 적용")
-    elif language:
-        search_params['relevanceLanguage'] = language
-        print(f"언어 필터 적용: {language}")
+    elif language == 'en':
+        search_params['relevanceLanguage'] = 'en'
+        print(f"영어 언어 필터 적용")
     if duration and not is_shorts:
         if duration == 'short':
             search_params['videoDuration'] = 'short'
@@ -141,12 +153,6 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         elif duration == 'long':
             search_params['videoDuration'] = 'long'
     print(f"YouTube API 검색 파라미터: {search_params}")
-    # 교육 관련 키워드 (확장)
-    korean_edu_keywords = [
-        '강의', '공부', '학습', '튜토리얼', '입문', '기초', '초급', '중급', '고급', '문법', '회화', '수업', '교육', '강좌', '실습', '예제', '따라하기', '마스터', '완전정복', '문제풀이', '설명', '가이드',
-        '자격증', '시험', '독학', '스터디', '노트', '정리', '요약', '해설', '풀이', '연습', '실전', '이론', '실습', '실전', '연습문제', '모의고사', '해설강의', '특강', '특강', '비법', '비법노트', '비법강의', '비법특강', '비법전수', '비법공개', '비법공유', '비법전략', '비법공부', '비법학습', '비법정리', '비법요약', '비법해설', '비법풀이', '비법연습', '비법실전', '비법이론', '비법실습', '비법실전', '비법연습문제', '비법모의고사', '비법해설강의', '비법특강', '비법특강', '비법비법', '비법비법노트', '비법비법강의', '비법비법특강', '비법비법전수', '비법비법공개', '비법비법공유', '비법비법전략', '비법비법공부', '비법비법학습', '비법비법정리', '비법비법요약', '비법비법해설', '비법비법풀이', '비법비법연습', '비법비법실전', '비법비법이론', '비법비법실습', '비법비법실전', '비법비법연습문제', '비법비법모의고사', '비법비법해설강의', '비법비법특강', '비법비법특강'
-    ]
-    english_edu_keywords = ['tutorial', 'course', 'lesson', 'learn', 'study', 'education', 'class', 'how to', 'beginner', 'intermediate', 'advanced', 'grammar', 'speaking', 'lecture', 'practice', 'example', 'master', 'complete', 'explained', 'guide']
     try:
         search_response = youtube.search().list(**search_params).execute()
         videos = []
@@ -174,17 +180,8 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                         continue
                 title = item['snippet']['title']
                 description = item['snippet']['description']
-                content_text = f"{title} {description}".lower()
-                # 교육 키워드 필터링 (더 완화)
-                if language == 'ko':
-                    if not any(k in content_text for k in korean_edu_keywords):
-                        # 제목에 키워드가 있으면 통과
-                        if not any(k in title for k in korean_edu_keywords):
-                            continue
-                else:
-                    if not any(k in content_text for k in english_edu_keywords):
-                        if not any(k in title for k in english_edu_keywords):
-                            continue
+                
+                # 교육 키워드 필터링 제거 - 모든 영상 허용
                 videos.append({
                     'title': title,
                     'description': description[:200] + '...' if len(description) > 200 else description,
@@ -248,4 +245,3 @@ def get_categories():
 if __name__ == "__main__":
     import os
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
- 
