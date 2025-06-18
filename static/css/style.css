@@ -88,7 +88,7 @@ body {
     margin-bottom: 1rem;
 }
 
-/* 🎯 메인 카테고리 버튼 - 1차 계층 (항공/여행 사이트 네비 스타일) */
+/* 🎯 메인 카테고리 버튼 - 1차 계층 (primary 컬러 활용) */
 .category-btn {
     padding: 0.75rem 1.25rem;
     border-radius: 6px;
@@ -104,15 +104,15 @@ body {
 }
 
 .category-btn:hover {
-    background: #f8f9fa;
-    color: #0066cc;
+    background: rgba(216, 101, 87, 0.1);
+    color: var(--primary-color);
     transform: none;
     box-shadow: none;
 }
 
 .category-btn.active {
-    background: #e7f3ff;
-    color: #0066cc;
+    background: var(--primary-color);
+    color: white;
     font-weight: 600;
 }
 
@@ -335,7 +335,7 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* 🎯 영상 언어 드롭다운 - 3차 계층 (렌더 선택 드롭다운 스타일) */
+/* 🎯 영상 언어 드롭다운 - 3차 계층 (둥근 드롭다운 스타일) */
 .video-lang-dropdown {
     display: flex;
     justify-content: center;
@@ -358,33 +358,33 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
     border: 1px solid #ddd;
     background: #ffffff;
     color: #333;
     font-size: 0.85rem;
     font-weight: 400;
     cursor: pointer;
-    transition: all 0.1s ease;
-    box-shadow: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     min-width: 100px;
 }
 
 .dropdown-toggle:hover {
-    border-color: #999;
-    box-shadow: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(216, 101, 87, 0.15);
 }
 
 .dropdown-arrow {
     font-size: 0.7rem;
-    transition: transform 0.1s ease;
+    transition: transform 0.2s ease;
     color: #666;
 }
 
 .dropdown-toggle.active {
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(216, 101, 87, 0.15);
 }
 
 .dropdown-toggle.active .dropdown-arrow {
@@ -398,15 +398,15 @@ body {
     right: 0;
     background: #ffffff;
     border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-2px);
-    transition: all 0.1s ease;
-    margin-top: 2px;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    margin-top: 4px;
     min-width: 100px;
 }
 
@@ -417,10 +417,10 @@ body {
 }
 
 .dropdown-item {
-    padding: 0.5rem 0.75rem;
+    padding: 0.6rem 1rem;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: background-color 0.1s ease;
+    transition: background-color 0.2s ease;
     border-bottom: none;
     color: #333;
 }
@@ -430,14 +430,15 @@ body {
 }
 
 .dropdown-item:hover {
-    background: #f8f9fa;
+    background: rgba(216, 101, 87, 0.05);
+    color: var(--primary-color);
 }
 
 .dropdown-item.active {
-    background: #007bff;
+    background: var(--primary-color);
     color: #ffffff;
 }
 
 .dropdown-item.active:hover {
-    background: #0056b3;
+    background: var(--primary-color);
 }
