@@ -117,34 +117,52 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     # 카테고리/서브카테고리에 따른 기본 검색어 설정
     if not query:
         if category == 'language' and subcategory == 'english':
-            query = '영어 회화 문법' if language == 'ko' else 'english tutorial grammar'
+            if language == 'ko':
+                query = '영어 회화 문법 공부 강의'  # 한국어로 된 영어 학습 영상
+            else:
+                query = 'english grammar conversation tutorial'
         elif category == 'programming':
-            query = '프로그래밍 강의' if language == 'ko' else 'programming tutorial'
+            if language == 'ko':
+                query = '프로그래밍 강의 코딩 배우기'
+            else:
+                query = 'programming tutorial coding course'
         elif category == 'hobby':
-            query = '취미 배우기' if language == 'ko' else 'hobby tutorial'
+            if language == 'ko':
+                query = '취미 배우기 만들기'
+            else:
+                query = 'hobby tutorial how to make'
         else:
-            query = '교육 강의' if language == 'ko' else 'education tutorial'
+            if language == 'ko':
+                query = '교육 강의 학습'
+            else:
+                query = 'education tutorial learning'
     
     original_query = query
     if query and len(query) > 15:
         query = simplify_search_query(query)
-    print(f"검색 요청: query='{query}', category='{category}', subcategory='{subcategory}', duration='{duration}', difficulty='{difficulty}', language='{language}', sortOrder='{sortOrder}', page_token='{page_token}', is_shorts='{is_shorts}'")
+    print(f"검색 요청: query='{query}', category='{category}', subcategory='{subcategory}', language='{language}'")
+    
     search_params = {
         'q': query,
         'part': 'snippet',
         'maxResults': 50 if not is_shorts else 100,
         'type': 'video',
-        'order': sortOrder
+        'order': 'viewCount'  # 인기순으로 고정
     }
+    
     if page_token:
         search_params['pageToken'] = page_token
+        
+    # 언어별 지역 및 언어 필터 적용
     if language == 'ko':
         search_params['regionCode'] = 'KR'
         search_params['relevanceLanguage'] = 'ko'
         print(f"한국어 지역/언어 필터 적용")
     elif language == 'en':
+        search_params['regionCode'] = 'US'
         search_params['relevanceLanguage'] = 'en'
-        print(f"영어 언어 필터 적용")
+        print(f"영어 지역/언어 필터 적용")
+    
     if duration and not is_shorts:
         if duration == 'short':
             search_params['videoDuration'] = 'short'
@@ -181,7 +199,6 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 title = item['snippet']['title']
                 description = item['snippet']['description']
                 
-                # 교육 키워드 필터링 제거 - 모든 영상 허용
                 videos.append({
                     'title': title,
                     'description': description[:200] + '...' if len(description) > 200 else description,
@@ -215,11 +232,13 @@ def search():
     query = request.form.get('query', '')
     category = request.form.get('category')
     subcategory = request.form.get('subcategory')
+    language = request.form.get('language', 'ko')
     page = int(request.form.get('page', 1))
     results = search_youtube_videos(
         query=query,
         category=category,
         subcategory=subcategory,
+        language=language,
         page_token=None if page == 1 else f"page_{page}"
     )
     return jsonify(results)
