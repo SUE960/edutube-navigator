@@ -323,18 +323,32 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* �� 영상 언어 버튼 - 3차 계층 (가장 작고 심플한 스타일) */
-.video-lang-row {
+/* 🎯 영상 언어 드롭다운 - 3차 계층 (드롭다운 형태) */
+.video-lang-dropdown {
     display: flex;
     justify-content: center;
-    margin-bottom: 1rem;
-    gap: 6px;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 0.75rem;
 }
 
-.video-lang-btn {
-    padding: 0.4rem 1rem;
+.dropdown-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 16px;
-    border: none;
+    border: 1px solid #e0e0e0;
     background: var(--card-background);
     color: var(--text-color);
     font-size: 0.85rem;
@@ -342,14 +356,68 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    min-width: 80px;
 }
 
-.video-lang-btn:hover {
-    transform: translateY(-1px);
+.dropdown-toggle:hover {
+    border-color: var(--primary-color);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.video-lang-btn.active {
+.dropdown-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-toggle.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card-background);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: #f8f8f8;
+}
+
+.dropdown-item.active {
     background: var(--primary-color);
     color: white;
+}
+
+.dropdown-item.active:hover {
+    background: var(--primary-color);
 }
