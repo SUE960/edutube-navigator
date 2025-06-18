@@ -34,10 +34,11 @@
             <button class="subcategory-btn" data-subcategory="chinese">중국어</button>
             <button class="subcategory-btn" data-subcategory="japanese">일본어</button>
         </div>
-        <!-- 영상 언어 선택 버튼 추가 -->
-        <div class="video-lang-row" style="display:flex; justify-content:center; margin-bottom:1rem; gap:10px;">
-            <button class="video-lang-btn active" data-lang="ko">한국어</button>
-            <button class="video-lang-btn" data-lang="en">영어</button>
+        <!-- 영상 언어 선택 -->
+        <div class="video-lang-list">
+            <span class="lang-item active" data-lang="ko">한국어</span>
+            <span class="lang-divider">•</span>
+            <span class="lang-item" data-lang="en">영어</span>
         </div>
         <!-- 비디오 리스트 -->
         <div class="video-list" id="videoList">
@@ -106,13 +107,19 @@
             });
             if (items.length > 0) currentSubcategory = items[0].toLowerCase();
         }
-        // 영상 언어 버튼 이벤트
-        const videoLangBtns = document.querySelectorAll('.video-lang-btn');
-        videoLangBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                videoLangBtns.forEach(b => b.classList.remove('active'));
+        // 영상 언어 리스트 이벤트
+        const langItems = document.querySelectorAll('.lang-item');
+        
+        langItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 활성 상태 변경
+                langItems.forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
+                
+                // 현재 언어 변경
                 currentLang = this.dataset.lang;
+                
+                // 검색 수행
                 performSearch();
             });
         });
@@ -192,4 +199,4 @@
         });
     </script>
 </body>
-</html>  
+</html> 
