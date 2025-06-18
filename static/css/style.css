@@ -88,30 +88,78 @@ body {
     margin-bottom: 1rem;
 }
 
-.category-btn,
+/* 🎯 메인 카테고리 버튼 - 1차 계층 (굵고 강한 스타일) */
+.category-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    border: 2px solid var(--primary-color);
+    background: var(--card-background);
+    color: var(--primary-color);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(216, 101, 87, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(216, 101, 87, 0.3);
+    background: var(--primary-color);
+    color: white;
+}
+
+.category-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(216, 101, 87, 0.4);
+}
+
+/* 🎯 서브 카테고리 버튼 - 2차 계층 (세련된 스타일) */
 .subcategory-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 20px;
-    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 18px;
+    border: 1px solid #e0e0e0;
     background: var(--card-background);
     color: var(--text-color);
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
 }
 
-.category-btn:hover,
+.subcategory-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(216, 101, 87, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.subcategory-btn:hover::before {
+    left: 100%;
+}
+
 .subcategory-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
-.category-btn.active,
 .subcategory-btn.active {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), #e85a4f);
     color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 3px 12px rgba(216, 101, 87, 0.3);
 }
 
 .recommend-btn {
@@ -301,33 +349,56 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
+/* 🎯 영상 언어 버튼 - 3차 계층 (심플하고 미니멀한 스타일) */
 .video-lang-row {
     display: flex;
     justify-content: center;
-    gap: 10px;
     margin-bottom: 1rem;
+    gap: 8px;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(216, 101, 87, 0.1);
 }
 
 .video-lang-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    border-radius: 12px;
     border: none;
-    background: var(--card-background);
-    color: var(--text-color);
-    font-size: 0.9rem;
-    font-weight: 500;
+    background: transparent;
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: var(--shadow);
+    position: relative;
+    min-width: 60px;
 }
 
-.video-lang-btn.active {
+.video-lang-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
     background: var(--primary-color);
-    color: white;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
 }
 
 .video-lang-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: var(--primary-color);
+    background: rgba(216, 101, 87, 0.05);
 }
- 
+
+.video-lang-btn.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    background: rgba(216, 101, 87, 0.1);
+}
+
+.video-lang-btn.active::after {
+    width: 80%;
+}
