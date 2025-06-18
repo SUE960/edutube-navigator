@@ -442,3 +442,35 @@ body {
 .dropdown-item.active:hover {
     background: var(--primary-color);
 }
+
+/* 🎯 영상 언어 리스트 - 3차 계층 (네이버 스타일 리스트) */
+.video-lang-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+}
+
+.lang-item {
+    font-size: 0.85rem;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0.25rem 0;
+}
+
+.lang-item:hover {
+    color: var(--primary-color);
+}
+
+.lang-item.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.lang-divider {
+    font-size: 0.85rem;
+    color: #ddd;
+    user-select: none;
+}
