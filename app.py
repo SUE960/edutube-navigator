@@ -108,54 +108,54 @@ def simplify_search_query(query: str) -> str:
     print(f"검색어 간소화: '{query}' → '{simplified}'")
     return simplified
 
-def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, sortOrder='relevance', language=None, page_token=None, is_shorts=False, recent_month=False):
+def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, sortOrder='relevance', language=None, page_token=None, is_shorts=False, recent_month=True):
     youtube = get_youtube_service()
     if youtube is None:
         print("❌ YouTube 서비스를 사용할 수 없습니다.")
         return {'videos': [], 'nextPageToken': None}
     
-    # 카테고리/서브카테고리에 따른 기본 검색어 설정
+    # 카테고리/서브카테고리에 따른 기본 검색어 설정 (교육 키워드 강화)
     if not query:
         if category == 'language' and subcategory == 'english':
             if language == 'ko':
-                query = '영어 회화 문법 공부 강의 한국어 설명'  # 한국어 설명 키워드 추가
+                query = '영어 회화 문법 공부 강의 한국어 설명 교육'  # 교육 키워드 추가
             else:
-                query = 'english grammar conversation tutorial'
+                query = 'english grammar conversation tutorial education'
         elif category == 'programming':
             if language == 'ko':
-                query = '프로그래밍 강의 코딩 배우기 한국어'  # 한국어 키워드 추가
+                query = '프로그래밍 강의 코딩 배우기 한국어 교육 튜토리얼'  # 교육 키워드 추가
             else:
-                query = 'programming tutorial coding course'
+                query = 'programming tutorial coding course education'
         elif category == 'hobby':
             if language == 'ko':
-                query = '취미 배우기 만들기 한국어'  # 한국어 키워드 추가
+                query = '취미 배우기 만들기 한국어 강의 교육'  # 교육 키워드 추가
             else:
-                query = 'hobby tutorial how to make'
+                query = 'hobby tutorial how to make education'
         elif category == 'certificate':
             if language == 'ko':
                 # 구체적인 자격증별 검색어 설정
                 if subcategory == '토익':
-                    query = '토익 TOEIC 문법 단어 리스닝 리딩 공부법 강의'
+                    query = '토익 TOEIC 문법 단어 리스닝 리딩 공부법 강의 교육'
                 elif subcategory == '토플':
-                    query = '토플 TOEFL IBT 스피킹 라이팅 리스닝 리딩 강의'
+                    query = '토플 TOEFL IBT 스피킹 라이팅 리스닝 리딩 강의 교육'
                 elif subcategory == '컴활':
-                    query = '컴활 컴퓨터활용능력 엑셀 파워포인트 컴퓨터 자격증 강의'
+                    query = '컴활 컴퓨터활용능력 엑셀 파워포인트 컴퓨터 자격증 강의 교육'
                 elif subcategory == '정보처리기사':
-                    query = '정보처리기사 필기 실기 프로그래밍 데이터베이스 강의'
+                    query = '정보처리기사 필기 실기 프로그래밍 데이터베이스 강의 교육'
                 else:
-                    query = '자격증 시험 공부 강의 한국어'
+                    query = '자격증 시험 공부 강의 한국어 교육'
             else:
                 if subcategory == 'toeic':
-                    query = 'TOEIC listening reading grammar vocabulary test prep'
+                    query = 'TOEIC listening reading grammar vocabulary test prep education'
                 elif subcategory == 'toefl':
-                    query = 'TOEFL IBT speaking writing listening reading test prep'
+                    query = 'TOEFL IBT speaking writing listening reading test prep education'
                 else:
-                    query = 'certificate exam preparation course'
+                    query = 'certificate exam preparation course education'
         else:
             if language == 'ko':
-                query = '교육 강의 학습 한국어'  # 한국어 키워드 추가
+                query = '교육 강의 학습 한국어 튜토리얼'  # 교육 키워드 강화
             else:
-                query = 'education tutorial learning'
+                query = 'education tutorial learning course'
     
     original_query = query
     if query and len(query) > 15:
@@ -170,7 +170,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         'order': 'viewCount'  # 인기순으로 고정
     }
     
-    # 최근 한달 필터 추가
+    # 기본적으로 최근 한달 필터 적용
     if recent_month:
         one_month_ago = datetime.now() - timedelta(days=30)
         published_after = one_month_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -229,6 +229,21 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 title = item['snippet']['title']
                 description = item['snippet']['description']
                 
+                # 교육 콘텐츠 필터링 강화
+                educational_keywords = ['강의', '교육', '배우기', '학습', '공부', '튜토리얼', '설명', '가르치', '레슨', '강좌', '코스']
+                non_educational_keywords = ['먹방', '브이로그', 'vlog', '일상', '리뷰', '언박싱', '게임', '오락', '예능', '웃긴', 'funny', 'meme']
+                
+                title_lower = title.lower()
+                description_lower = description.lower()
+                
+                # 교육 키워드 포함 여부 확인
+                has_educational = any(keyword in title_lower or keyword in description_lower for keyword in educational_keywords)
+                has_non_educational = any(keyword in title_lower or keyword in description_lower for keyword in non_educational_keywords)
+                
+                # 비교육 콘텐츠 제외
+                if has_non_educational and not has_educational:
+                    continue
+                
                 # 한국어 필터링 강화: 제목에서 한글 비율 확인
                 if language == 'ko':
                     korean_chars = len([c for c in title if '\uac00' <= c <= '\ud7af'])
@@ -271,7 +286,7 @@ def search():
     subcategory = request.form.get('subcategory')
     language = request.form.get('language', 'ko')
     page = int(request.form.get('page', 1))
-    recent_month = request.form.get('recent_month', 'false').lower() == 'true'
+    recent_month = request.form.get('recent_month', 'true').lower() == 'true'
     
     results = search_youtube_videos(
         query=query,
