@@ -41,13 +41,21 @@
         
         <!-- 영상 언어 선택 & 콘텐츠 타입 선택 -->
         <div class="filter-controls">
-            <div class="filter-group">
+            <div class="filter-group dropdown" id="languageDropdown">
                 <span class="filter-icon">▼</span>
-                <span class="filter-label">영상언어</span>
+                <span class="filter-label" id="languageLabel">한국어</span>
+                <div class="dropdown-menu" id="languageMenu">
+                    <div class="dropdown-item active" data-lang="ko">한국어</div>
+                    <div class="dropdown-item" data-lang="en">영어</div>
+                </div>
             </div>
-            <div class="filter-group">
+            <div class="filter-group dropdown" id="contentTypeDropdown">
                 <span class="filter-icon">▼</span>
-                <span class="filter-label">영상유형</span>
+                <span class="filter-label" id="contentTypeLabel">비디오</span>
+                <div class="dropdown-menu" id="contentTypeMenu">
+                    <div class="dropdown-item active" data-type="video">비디오</div>
+                    <div class="dropdown-item" data-type="shorts">쇼츠</div>
+                </div>
             </div>
         </div>
         
@@ -210,8 +218,79 @@
             currentCategory = 'language';
             currentSubcategory = 'english';
             currentSortOrder = 'viewCount';
+            
+            // 드롭다운 초기화
+            setupDropdowns();
+            
             performSearch();
         });
+        
+        // 드롭다운 기능
+        function setupDropdowns() {
+            // 언어 드롭다운
+            const languageDropdown = document.getElementById('languageDropdown');
+            const languageMenu = document.getElementById('languageMenu');
+            const languageLabel = document.getElementById('languageLabel');
+            
+            languageDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageMenu.classList.toggle('show');
+                // 다른 드롭다운 닫기
+                document.getElementById('contentTypeMenu').classList.remove('show');
+            });
+            
+            languageMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    // 이전 활성 항목 제거
+                    languageMenu.querySelector('.active').classList.remove('active');
+                    // 새 항목 활성화
+                    e.target.classList.add('active');
+                    // 라벨 업데이트
+                    languageLabel.textContent = e.target.textContent;
+                    // 언어 변경
+                    currentLang = e.target.dataset.lang;
+                    // 드롭다운 닫기
+                    languageMenu.classList.remove('show');
+                    // 검색 실행
+                    performSearch();
+                }
+            });
+            
+            // 콘텐츠 타입 드롭다운
+            const contentTypeDropdown = document.getElementById('contentTypeDropdown');
+            const contentTypeMenu = document.getElementById('contentTypeMenu');
+            const contentTypeLabel = document.getElementById('contentTypeLabel');
+            
+            contentTypeDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                contentTypeMenu.classList.toggle('show');
+                // 다른 드롭다운 닫기
+                document.getElementById('languageMenu').classList.remove('show');
+            });
+            
+            contentTypeMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    // 이전 활성 항목 제거
+                    contentTypeMenu.querySelector('.active').classList.remove('active');
+                    // 새 항목 활성화
+                    e.target.classList.add('active');
+                    // 라벨 업데이트
+                    contentTypeLabel.textContent = e.target.textContent;
+                    // 콘텐츠 타입 변경
+                    currentContentType = e.target.dataset.type;
+                    // 드롭다운 닫기
+                    contentTypeMenu.classList.remove('show');
+                    // 검색 실행
+                    performSearch();
+                }
+            });
+            
+            // 외부 클릭시 드롭다운 닫기
+            document.addEventListener('click', function() {
+                languageMenu.classList.remove('show');
+                contentTypeMenu.classList.remove('show');
+            });
+        }
     </script>
 </body>
 </html> 
