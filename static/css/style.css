@@ -474,3 +474,30 @@ body {
     color: #ddd;
     user-select: none;
 }
+
+/* 🎯 최근 한달 필터 체크박스 */
+.recent-filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #666;
+    user-select: none;
+}
+
+.filter-checkbox input[type="checkbox"] {
+    margin-right: 0.5rem;
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.filter-checkbox:hover {
+    color: var(--primary-color);
+}
