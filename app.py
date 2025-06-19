@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import isodate
-from datetime import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -108,7 +108,7 @@ def simplify_search_query(query: str) -> str:
     print(f"검색어 간소화: '{query}' → '{simplified}'")
     return simplified
 
-def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, sortOrder='relevance', language=None, page_token=None, is_shorts=False):
+def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, sortOrder='relevance', language=None, page_token=None, is_shorts=False, recent_month=False):
     youtube = get_youtube_service()
     if youtube is None:
         print("❌ YouTube 서비스를 사용할 수 없습니다.")
@@ -160,7 +160,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     original_query = query
     if query and len(query) > 15:
         query = simplify_search_query(query)
-    print(f"검색 요청: query='{query}', category='{category}', subcategory='{subcategory}', language='{language}'")
+    print(f"검색 요청: query='{query}', category='{category}', subcategory='{subcategory}', language='{language}', recent_month={recent_month}")
     
     search_params = {
         'q': query,
@@ -169,6 +169,13 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         'type': 'video',
         'order': 'viewCount'  # 인기순으로 고정
     }
+    
+    # 최근 한달 필터 추가
+    if recent_month:
+        one_month_ago = datetime.now() - timedelta(days=30)
+        published_after = one_month_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+        search_params['publishedAfter'] = published_after
+        print(f"최근 한달 필터 적용: {published_after} 이후 영상만")
     
     if page_token:
         search_params['pageToken'] = page_token
@@ -264,11 +271,14 @@ def search():
     subcategory = request.form.get('subcategory')
     language = request.form.get('language', 'ko')
     page = int(request.form.get('page', 1))
+    recent_month = request.form.get('recent_month', 'false').lower() == 'true'
+    
     results = search_youtube_videos(
         query=query,
         category=category,
         subcategory=subcategory,
         language=language,
+        recent_month=recent_month,
         page_token=None if page == 1 else f"page_{page}"
     )
     return jsonify(results)
