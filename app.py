@@ -118,22 +118,22 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     if not query:
         if category == 'language' and subcategory == 'english':
             if language == 'ko':
-                query = '영어 회화 문법 공부 강의'  # 한국어로 된 영어 학습 영상
+                query = '영어 회화 문법 공부 강의 한국어 설명'  # 한국어 설명 키워드 추가
             else:
                 query = 'english grammar conversation tutorial'
         elif category == 'programming':
             if language == 'ko':
-                query = '프로그래밍 강의 코딩 배우기'
+                query = '프로그래밍 강의 코딩 배우기 한국어'  # 한국어 키워드 추가
             else:
                 query = 'programming tutorial coding course'
         elif category == 'hobby':
             if language == 'ko':
-                query = '취미 배우기 만들기'
+                query = '취미 배우기 만들기 한국어'  # 한국어 키워드 추가
             else:
                 query = 'hobby tutorial how to make'
         else:
             if language == 'ko':
-                query = '교육 강의 학습'
+                query = '교육 강의 학습 한국어'  # 한국어 키워드 추가
             else:
                 query = 'education tutorial learning'
     
@@ -157,6 +157,9 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
     if language == 'ko':
         search_params['regionCode'] = 'KR'
         search_params['relevanceLanguage'] = 'ko'
+        # 한국어 필터링을 위한 추가 검색어 조정
+        if '한국어' not in query:
+            search_params['q'] = f"{query} 한국어"
         print(f"한국어 지역/언어 필터 적용")
     elif language == 'en':
         search_params['regionCode'] = 'US'
@@ -198,6 +201,13 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                         continue
                 title = item['snippet']['title']
                 description = item['snippet']['description']
+                
+                # 한국어 필터링 강화: 제목에서 한글 비율 확인
+                if language == 'ko':
+                    korean_chars = len([c for c in title if '\uac00' <= c <= '\ud7af'])
+                    total_chars = len([c for c in title if c.isalpha()])
+                    if total_chars > 0 and korean_chars / total_chars < 0.3:  # 한글 비율이 30% 미만이면 제외
+                        continue
                 
                 videos.append({
                     'title': title,
