@@ -287,6 +287,8 @@ def search():
     language = request.form.get('language', 'ko')
     page = int(request.form.get('page', 1))
     recent_month = request.form.get('recent_month', 'true').lower() == 'true'
+    content_type = request.form.get('content_type', 'video')  # 'video' 또는 'shorts'
+    is_shorts = content_type == 'shorts'
     
     results = search_youtube_videos(
         query=query,
@@ -294,6 +296,7 @@ def search():
         subcategory=subcategory,
         language=language,
         recent_month=recent_month,
+        is_shorts=is_shorts,
         page_token=None if page == 1 else f"page_{page}"
     )
     return jsonify(results)
@@ -319,3 +322,4 @@ def get_categories():
 if __name__ == "__main__":
     import os
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
