@@ -9,10 +9,6 @@
 </head>
 <body>
     <div class="main-container">
-        <!-- 햄버거 메뉴 -->
-        <button class="menu-btn" id="menuBtn">
-            <i class="fas fa-bars"></i>
-        </button>
         <!-- 로고 -->
         <h1 class="logo">EduTube</h1>
         
@@ -21,6 +17,19 @@
             <p class="main-desc">🔥 한국 최근 한달 인기 교육 영상 큐레이션</p>
             <p class="sub-desc">AI가 엄선한 고품질 학습 콘텐츠를 만나보세요</p>
         </div>
+        
+        <!-- 콘텐츠 타입 선택 -->
+        <div class="content-type-tabs">
+            <button class="content-type-btn active" data-type="video">
+                <i class="fas fa-play"></i>
+                비디오 (1분 이상)
+            </button>
+            <button class="content-type-btn" data-type="shorts">
+                <i class="fas fa-mobile-alt"></i>
+                쇼츠 (1분 미만)
+            </button>
+        </div>
+        
         <!-- 검색 영역 -->
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
@@ -87,6 +96,8 @@
         let isLoading = false;
         let currentSortOrder = 'viewCount';
         let currentLang = 'ko';
+        let currentContentType = 'video'; // 기본값: 비디오
+        
         const categoryData = {
             language: ['영어', '중국어', '일본어'],
             programming: ['Python', 'JavaScript', '웹개발', '데이터분석'],
@@ -94,6 +105,17 @@
             certificate: ['토익', '토플', '컴활', '정보처리기사'],
             etc: ['기타', '교양', '상식']
         };
+        
+        // 콘텐츠 타입 탭 이벤트
+        document.querySelectorAll('.content-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.content-type-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentContentType = this.dataset.type;
+                performSearch();
+            });
+        });
+        
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
@@ -103,6 +125,7 @@
                 performSearch();
             });
         });
+        
         function updateSubcategories(category) {
             const items = categoryData[category] || [];
             const subRow = document.querySelector('.subcategory-row');
@@ -154,6 +177,7 @@
             formData.append('sortOrder', currentSortOrder);
             formData.append('language', currentLang);
             formData.append('recent_month', recentMonth);
+            formData.append('content_type', currentContentType);
             
             fetch('/search', { method: 'POST', body: formData })
             .then(response => response.json())
@@ -178,13 +202,24 @@
             videos.forEach(video => {
                 const card = document.createElement('div');
                 card.className = 'video-card';
+                
+                // 콘텐츠 타입에 따른 뱃지 추가
+                const contentBadge = currentContentType === 'shorts' 
+                    ? '<span class="content-badge shorts">🎬 쇼츠</span>'
+                    : '<span class="content-badge video">📹 비디오</span>';
+                
                 card.innerHTML = `
                     <div class="video-thumbnail">
                         ${video.thumbnail ? `<img src="${video.thumbnail}" alt="${video.title}">` : `<div>thumbnail</div>`}
+                        ${contentBadge}
                     </div>
                     <div class="video-info">
                         <div class="video-title">${video.title}</div>
                         <div class="video-channel">${video.channelTitle}</div>
+                        <div class="video-meta">
+                            <span>⏱️ ${video.duration}</span>
+                            <span>👀 ${video.viewCount?.toLocaleString() || '정보 없음'}</span>
+                        </div>
                         <div class="video-summary">${video.summary || video.description || 'This is Summary'}</div>
                     </div>
                 `;
