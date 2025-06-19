@@ -8,33 +8,21 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <!-- 최상단 검은 띠 배너 -->
+    <div class="top-banner">
+        🔥 한국 최근 한달 인기 교육 영상 큐레이션 AI가 엄선한 고품질 학습 콘텐츠를 만나보세요
+    </div>
+    
     <div class="main-container">
         <!-- 로고 -->
         <h1 class="logo">EduTube</h1>
-        
-        <!-- 서비스 설명 -->
-        <div class="service-description">
-            <p class="main-desc">🔥 한국 최근 한달 인기 교육 영상 큐레이션</p>
-            <p class="sub-desc">AI가 엄선한 고품질 학습 콘텐츠를 만나보세요</p>
-        </div>
-        
-        <!-- 콘텐츠 타입 선택 -->
-        <div class="content-type-tabs">
-            <button class="content-type-btn active" data-type="video">
-                <i class="fas fa-play"></i>
-                비디오 (1분 이상)
-            </button>
-            <button class="content-type-btn" data-type="shorts">
-                <i class="fas fa-mobile-alt"></i>
-                쇼츠 (1분 미만)
-            </button>
-        </div>
         
         <!-- 검색 영역 -->
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요">
         </div>
+        
         <!-- 카테고리 버튼들 -->
         <div class="category-row">
             <button class="category-btn active" data-category="language">Language</button>
@@ -43,27 +31,26 @@
             <button class="category-btn" data-category="certificate">Certificate</button>
             <button class="category-btn" data-category="etc">Etc</button>
         </div>
+        
         <!-- 하위 카테고리 -->
         <div class="language-tabs subcategory-row">
             <button class="subcategory-btn active" data-subcategory="english">영어</button>
             <button class="subcategory-btn" data-subcategory="chinese">중국어</button>
             <button class="subcategory-btn" data-subcategory="japanese">일본어</button>
         </div>
-        <!-- 영상 언어 선택 -->
-        <div class="video-lang-list">
-            <span class="lang-item active" data-lang="ko">한국어</span>
-            <span class="lang-divider">•</span>
-            <span class="lang-item" data-lang="en">영어</span>
+        
+        <!-- 영상 언어 선택 & 콘텐츠 타입 선택 -->
+        <div class="filter-controls">
+            <div class="filter-group">
+                <span class="filter-icon">▼</span>
+                <span class="filter-label">영상언어</span>
+            </div>
+            <div class="filter-group">
+                <span class="filter-icon">▼</span>
+                <span class="filter-label">영상유형</span>
+            </div>
         </div>
         
-        <!-- 최근 한달 인기 영상 필터 -->
-        <div class="recent-filter">
-            <label class="filter-checkbox">
-                <input type="checkbox" id="recentMonthFilter">
-                <span class="checkmark"></span>
-                전체 기간 영상 보기
-            </label>
-        </div>
         <!-- 비디오 리스트 -->
         <div class="video-list" id="videoList">
             <!-- 비디오 카드들이 여기에 동적으로 추가됩니다 -->
@@ -106,16 +93,6 @@
             etc: ['기타', '교양', '상식']
         };
         
-        // 콘텐츠 타입 탭 이벤트
-        document.querySelectorAll('.content-type-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.content-type-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentContentType = this.dataset.type;
-                performSearch();
-            });
-        });
-        
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
@@ -145,29 +122,13 @@
             });
             if (items.length > 0) currentSubcategory = items[0].toLowerCase();
         }
-        // 영상 언어 리스트 이벤트
-        const langItems = document.querySelectorAll('.lang-item');
         
-        langItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // 활성 상태 변경
-                langItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                
-                // 현재 언어 변경
-                currentLang = this.dataset.lang;
-                
-                // 검색 수행
-                performSearch();
-            });
-        });
         function performSearch() {
             if (isLoading) return;
             isLoading = true;
             document.getElementById('videoList').innerHTML = '';
             document.getElementById('emptyState').style.display = 'none';
             const searchQuery = document.getElementById('searchInput').value.trim();
-            const recentMonth = !document.getElementById('recentMonthFilter').checked;
             
             const formData = new FormData();
             formData.append('query', searchQuery || '');
@@ -176,7 +137,7 @@
             formData.append('page', currentPage);
             formData.append('sortOrder', currentSortOrder);
             formData.append('language', currentLang);
-            formData.append('recent_month', recentMonth);
+            formData.append('recent_month', 'true'); // 기본값: 최근 한달
             formData.append('content_type', currentContentType);
             
             fetch('/search', { method: 'POST', body: formData })
@@ -250,11 +211,6 @@
             currentSubcategory = 'english';
             currentSortOrder = 'viewCount';
             performSearch();
-            
-            // 최근 한달 필터 변경시 자동 검색
-            document.getElementById('recentMonthFilter').addEventListener('change', function() {
-                performSearch();
-            });
         });
     </script>
 </body>
