@@ -24,6 +24,19 @@ body {
     min-height: 100vh;
 }
 
+/* 🎯 최상단 검은 띠 배너 */
+.top-banner {
+    background: #000;
+    color: white;
+    text-align: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
 .main-container {
     max-width: 600px;
     margin: 0 auto;
@@ -37,9 +50,9 @@ body {
 .logo {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: #000; /* 검은색으로 변경 */
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     width: 100%;
 }
 
@@ -243,6 +256,7 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease;
+    margin-bottom: 1rem;
 }
 
 .video-card:hover {
@@ -581,4 +595,41 @@ body {
 
 .filter-checkbox:hover {
     color: var(--primary-color);
+}
+
+/* 🎯 새로운 필터 컨트롤 */
+.filter-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.filter-group:hover {
+    border-color: #999;
+}
+
+.filter-icon {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.filter-label {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
 }
