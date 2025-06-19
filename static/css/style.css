@@ -104,7 +104,7 @@ body {
 }
 
 .category-btn:hover {
-    background: rgba(216, 101, 87, 0.15);
+    background: rgba(216, 101, 87, 0.08);
     color: var(--primary-color);
     transform: none;
     box-shadow: none;
