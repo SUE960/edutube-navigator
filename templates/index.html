@@ -40,6 +40,15 @@
             <span class="lang-divider">•</span>
             <span class="lang-item" data-lang="en">영어</span>
         </div>
+        
+        <!-- 최근 한달 인기 영상 필터 -->
+        <div class="recent-filter">
+            <label class="filter-checkbox">
+                <input type="checkbox" id="recentMonthFilter">
+                <span class="checkmark"></span>
+                최근 한달 인기 영상만
+            </label>
+        </div>
         <!-- 비디오 리스트 -->
         <div class="video-list" id="videoList">
             <!-- 비디오 카드들이 여기에 동적으로 추가됩니다 -->
@@ -129,6 +138,8 @@
             document.getElementById('videoList').innerHTML = '';
             document.getElementById('emptyState').style.display = 'none';
             const searchQuery = document.getElementById('searchInput').value.trim();
+            const recentMonth = document.getElementById('recentMonthFilter').checked;
+            
             const formData = new FormData();
             formData.append('query', searchQuery || '');
             formData.append('category', currentCategory);
@@ -136,6 +147,8 @@
             formData.append('page', currentPage);
             formData.append('sortOrder', currentSortOrder);
             formData.append('language', currentLang);
+            formData.append('recent_month', recentMonth);
+            
             fetch('/search', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
@@ -196,6 +209,11 @@
             currentSubcategory = 'english';
             currentSortOrder = 'viewCount';
             performSearch();
+            
+            // 최근 한달 필터 변경시 자동 검색
+            document.getElementById('recentMonthFilter').addEventListener('change', function() {
+                performSearch();
+            });
         });
     </script>
 </body>
