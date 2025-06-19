@@ -15,6 +15,12 @@
         </button>
         <!-- 로고 -->
         <h1 class="logo">EduTube</h1>
+        
+        <!-- 서비스 설명 -->
+        <div class="service-description">
+            <p class="main-desc">🔥 한국 최근 한달 인기 교육 영상 큐레이션</p>
+            <p class="sub-desc">AI가 엄선한 고품질 학습 콘텐츠를 만나보세요</p>
+        </div>
         <!-- 검색 영역 -->
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
@@ -46,7 +52,7 @@
             <label class="filter-checkbox">
                 <input type="checkbox" id="recentMonthFilter">
                 <span class="checkmark"></span>
-                최근 한달 인기 영상만
+                전체 기간 영상 보기
             </label>
         </div>
         <!-- 비디오 리스트 -->
@@ -138,7 +144,7 @@
             document.getElementById('videoList').innerHTML = '';
             document.getElementById('emptyState').style.display = 'none';
             const searchQuery = document.getElementById('searchInput').value.trim();
-            const recentMonth = document.getElementById('recentMonthFilter').checked;
+            const recentMonth = !document.getElementById('recentMonthFilter').checked;
             
             const formData = new FormData();
             formData.append('query', searchQuery || '');
