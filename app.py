@@ -131,6 +131,26 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 query = '취미 배우기 만들기 한국어'  # 한국어 키워드 추가
             else:
                 query = 'hobby tutorial how to make'
+        elif category == 'certificate':
+            if language == 'ko':
+                # 구체적인 자격증별 검색어 설정
+                if subcategory == '토익':
+                    query = '토익 TOEIC 문법 단어 리스닝 리딩 공부법 강의'
+                elif subcategory == '토플':
+                    query = '토플 TOEFL IBT 스피킹 라이팅 리스닝 리딩 강의'
+                elif subcategory == '컴활':
+                    query = '컴활 컴퓨터활용능력 엑셀 파워포인트 컴퓨터 자격증 강의'
+                elif subcategory == '정보처리기사':
+                    query = '정보처리기사 필기 실기 프로그래밍 데이터베이스 강의'
+                else:
+                    query = '자격증 시험 공부 강의 한국어'
+            else:
+                if subcategory == 'toeic':
+                    query = 'TOEIC listening reading grammar vocabulary test prep'
+                elif subcategory == 'toefl':
+                    query = 'TOEFL IBT speaking writing listening reading test prep'
+                else:
+                    query = 'certificate exam preparation course'
         else:
             if language == 'ko':
                 query = '교육 강의 학습 한국어'  # 한국어 키워드 추가
