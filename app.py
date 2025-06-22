@@ -1,4 +1,3 @@
-나의 말:
 from flask import Flask, render_template, request, jsonify
 import json
 import re
