@@ -298,6 +298,21 @@ body {
     background: rgba(216, 101, 87, 0.9);
 }
 
+/* 🎯 인기 유튜버 뱃지 */
+.popular-channel-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: white;
+    background: rgba(255, 215, 0, 0.9);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
 .video-info {
     padding: 1rem;
 }
