@@ -332,16 +332,38 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 print(f"비디오 정보 처리 오류: {e}")
                 continue
         
-        # 3단계: 인기 유튜버 영상과 일반 영상 혼합
+        # 3단계: 인기 유튜버 영상과 일반 영상 혼합 (채널별 중복 방지)
+        # 인기 유튜버 영상을 먼저 처리하여 우선권 부여
         all_videos = popular_videos + videos
         
-        # 중복 제거 (같은 videoId)
-        seen_ids = set()
+        # 중복 제거 (같은 videoId와 같은 채널 방지)
+        seen_video_ids = set()
+        seen_channel_names = set()
         unique_videos = []
-        for video in all_videos:
-            if video['videoId'] not in seen_ids:
-                seen_ids.add(video['videoId'])
+        
+        # 인기 유튜버 영상 먼저 처리 (우선권)
+        for video in popular_videos:
+            video_id = video['videoId']
+            clean_channel_name = video['channelTitle'].replace(' ⭐', '').strip()
+            
+            if video_id not in seen_video_ids and clean_channel_name not in seen_channel_names:
+                seen_video_ids.add(video_id)
+                seen_channel_names.add(clean_channel_name)
                 unique_videos.append(video)
+                print(f"✅ 인기 유튜버 추가: {clean_channel_name}")
+        
+        # 일반 검색 결과 처리 (중복 채널 제외)
+        for video in videos:
+            video_id = video['videoId']
+            clean_channel_name = video['channelTitle'].replace(' ⭐', '').strip()
+            
+            if video_id not in seen_video_ids and clean_channel_name not in seen_channel_names:
+                seen_video_ids.add(video_id)
+                seen_channel_names.add(clean_channel_name)
+                unique_videos.append(video)
+                print(f"➕ 일반 검색 추가: {clean_channel_name}")
+            else:
+                print(f"⚠️ 중복 제외: {clean_channel_name}")
         
         # 최종 정렬
         if sortOrder == 'viewCount':
@@ -350,7 +372,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
             unique_videos.sort(key=lambda x: x['publishedAt'], reverse=True)
         
         next_page_token = search_response.get('nextPageToken')
-        print(f"최종 결과: 인기 유튜버 {len(popular_videos)}개 + 일반 검색 {len(videos)}개 = 총 {len(unique_videos)}개")
+        print(f"🎯 최종 결과: 인기 유튜버 {len([v for v in unique_videos if v.get('isPopularChannel')])}개 + 일반 검색 {len([v for v in unique_videos if not v.get('isPopularChannel')])}개 = 총 {len(unique_videos)}개")
         return {
             'videos': unique_videos[:max_results],
             'nextPageToken': next_page_token
