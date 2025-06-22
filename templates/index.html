@@ -39,7 +39,7 @@
             <button class="subcategory-btn" data-subcategory="japanese">일본어</button>
         </div>
         
-        <!-- 영상 언어 선택 & 콘텐츠 타입 선택 & 정렬 옵션 -->
+        <!-- 영상 언어 선택 & 콘텐츠 타입 선택 -->
         <div class="filter-controls">
             <div class="filter-group dropdown" id="languageDropdown">
                 <span class="filter-icon">▼</span>
@@ -55,14 +55,6 @@
                 <div class="dropdown-menu" id="contentTypeMenu">
                     <div class="dropdown-item active" data-type="video">비디오</div>
                     <div class="dropdown-item" data-type="shorts">쇼츠</div>
-                </div>
-            </div>
-            <div class="filter-group dropdown" id="sortOrderDropdown">
-                <span class="filter-icon">▼</span>
-                <span class="filter-label" id="sortOrderLabel">인기순</span>
-                <div class="dropdown-menu" id="sortOrderMenu">
-                    <div class="dropdown-item active" data-sort="viewCount">🔥 인기순</div>
-                    <div class="dropdown-item" data-sort="date">🆕 최신순</div>
                 </div>
             </div>
         </div>
@@ -83,11 +75,16 @@
         </div>
         <!-- 페이지네이션 -->
         <div class="pagination" id="pagination">
+            <button class="page-number" data-page="prev">‹ 이전</button>
             <button class="page-number active" data-page="1">1</button>
             <button class="page-number" data-page="2">2</button>
             <button class="page-number" data-page="3">3</button>
             <button class="page-number" data-page="4">4</button>
             <button class="page-number" data-page="5">5</button>
+            <button class="page-number" data-page="6">6</button>
+            <button class="page-number" data-page="7">7</button>
+            <button class="page-number" data-page="8">8</button>
+            <button class="page-number" data-page="next">다음 ›</button>
         </div>
     </div>
     <!-- 사이드바/오버레이 등은 필요시 추가 -->
@@ -97,7 +94,6 @@
         let currentSubcategory = 'english';
         let currentPage = 1;
         let isLoading = false;
-        let currentSortOrder = 'viewCount';
         let currentLang = 'ko';
         let currentContentType = 'video'; // 기본값: 비디오
         let allVideos = []; // 전체 영상 데이터 저장
@@ -154,7 +150,6 @@
             formData.append('category', currentCategory);
             formData.append('subcategory', currentSubcategory);
             formData.append('page', 1); // 항상 1페이지로 요청
-            formData.append('sortOrder', currentSortOrder);
             formData.append('language', currentLang);
             formData.append('recent_month', 'true'); // 기본값: 최근 한달
             formData.append('content_type', currentContentType);
@@ -234,15 +229,27 @@
             
             pagination.style.display = 'flex';
             
-            // 기존 페이지 버튼들 업데이트
+            // 모든 페이지 버튼들 업데이트
             const pageButtons = pagination.querySelectorAll('.page-number');
-            pageButtons.forEach((btn, index) => {
-                const pageNum = index + 1;
-                if (pageNum <= totalPages) {
+            pageButtons.forEach((btn) => {
+                const pageValue = btn.dataset.page;
+                
+                if (pageValue === 'prev') {
                     btn.style.display = 'block';
-                    btn.classList.toggle('active', pageNum === currentPage);
+                    btn.disabled = currentPage === 1;
+                    btn.classList.toggle('disabled', currentPage === 1);
+                } else if (pageValue === 'next') {
+                    btn.style.display = 'block';
+                    btn.disabled = currentPage === totalPages;
+                    btn.classList.toggle('disabled', currentPage === totalPages);
                 } else {
-                    btn.style.display = 'none';
+                    const pageNum = parseInt(pageValue);
+                    if (pageNum <= totalPages) {
+                        btn.style.display = 'block';
+                        btn.classList.toggle('active', pageNum === currentPage);
+                    } else {
+                        btn.style.display = 'none';
+                    }
                 }
             });
         }
@@ -260,18 +267,37 @@
         document.querySelectorAll('.page-number').forEach(pageBtn => {
             pageBtn.addEventListener('click', function() {
                 if (allVideos.length === 0) return; // 데이터가 없으면 무시
+                if (this.classList.contains('disabled')) return; // 비활성화된 버튼 무시
                 
-                document.querySelectorAll('.page-number').forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                currentPage = parseInt(this.dataset.page);
-                displayCurrentPage(); // 클라이언트 사이드에서 페이지 표시
+                const pageValue = this.dataset.page;
+                let newPage = currentPage;
+                
+                if (pageValue === 'prev') {
+                    newPage = Math.max(1, currentPage - 1);
+                } else if (pageValue === 'next') {
+                    const totalPages = Math.ceil(allVideos.length / videosPerPage);
+                    newPage = Math.min(totalPages, currentPage + 1);
+                } else {
+                    newPage = parseInt(pageValue);
+                }
+                
+                if (newPage !== currentPage) {
+                    document.querySelectorAll('.page-number').forEach(p => p.classList.remove('active'));
+                    if (pageValue !== 'prev' && pageValue !== 'next') {
+                        this.classList.add('active');
+                    } else {
+                        document.querySelector(`[data-page="${newPage}"]`).classList.add('active');
+                    }
+                    currentPage = newPage;
+                    displayCurrentPage(); // 클라이언트 사이드에서 페이지 표시
+                    setupPagination(); // 페이지네이션 상태 업데이트
+                }
             });
         });
         document.addEventListener('DOMContentLoaded', function() {
             updateSubcategories('language');
             currentCategory = 'language';
             currentSubcategory = 'english';
-            currentSortOrder = 'viewCount';
             
             // 드롭다운 초기화
             setupDropdowns();
@@ -291,7 +317,6 @@
                 languageMenu.classList.toggle('show');
                 // 다른 드롭다운 닫기
                 document.getElementById('contentTypeMenu').classList.remove('show');
-                document.getElementById('sortOrderMenu').classList.remove('show');
             });
             
             languageMenu.addEventListener('click', function(e) {
@@ -321,7 +346,6 @@
                 contentTypeMenu.classList.toggle('show');
                 // 다른 드롭다운 닫기
                 document.getElementById('languageMenu').classList.remove('show');
-                document.getElementById('sortOrderMenu').classList.remove('show');
             });
             
             contentTypeMenu.addEventListener('click', function(e) {
@@ -341,41 +365,10 @@
                 }
             });
             
-            // 정렬 옵션 드롭다운
-            const sortOrderDropdown = document.getElementById('sortOrderDropdown');
-            const sortOrderMenu = document.getElementById('sortOrderMenu');
-            const sortOrderLabel = document.getElementById('sortOrderLabel');
-            
-            sortOrderDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-                sortOrderMenu.classList.toggle('show');
-                // 다른 드롭다운 닫기
-                document.getElementById('languageMenu').classList.remove('show');
-                document.getElementById('contentTypeMenu').classList.remove('show');
-            });
-            
-            sortOrderMenu.addEventListener('click', function(e) {
-                if (e.target.classList.contains('dropdown-item')) {
-                    // 이전 활성 항목 제거
-                    sortOrderMenu.querySelector('.active').classList.remove('active');
-                    // 새 항목 활성화
-                    e.target.classList.add('active');
-                    // 라벨 업데이트
-                    sortOrderLabel.textContent = e.target.textContent;
-                    // 정렬 옵션 변경
-                    currentSortOrder = e.target.dataset.sort;
-                    // 드롭다운 닫기
-                    sortOrderMenu.classList.remove('show');
-                    // 검색 실행
-                    performSearch();
-                }
-            });
-            
             // 외부 클릭시 드롭다운 닫기
             document.addEventListener('click', function() {
                 languageMenu.classList.remove('show');
                 contentTypeMenu.classList.remove('show');
-                sortOrderMenu.classList.remove('show');
             });
         }
     </script>
