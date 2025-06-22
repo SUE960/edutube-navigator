@@ -39,7 +39,7 @@
             <button class="subcategory-btn" data-subcategory="japanese">일본어</button>
         </div>
         
-        <!-- 영상 언어 선택 & 콘텐츠 타입 선택 -->
+        <!-- 영상 언어 선택 & 콘텐츠 타입 선택 & 정렬 옵션 -->
         <div class="filter-controls">
             <div class="filter-group dropdown" id="languageDropdown">
                 <span class="filter-icon">▼</span>
@@ -55,6 +55,14 @@
                 <div class="dropdown-menu" id="contentTypeMenu">
                     <div class="dropdown-item active" data-type="video">비디오</div>
                     <div class="dropdown-item" data-type="shorts">쇼츠</div>
+                </div>
+            </div>
+            <div class="filter-group dropdown" id="sortOrderDropdown">
+                <span class="filter-icon">▼</span>
+                <span class="filter-label" id="sortOrderLabel">인기순</span>
+                <div class="dropdown-menu" id="sortOrderMenu">
+                    <div class="dropdown-item active" data-sort="viewCount">🔥 인기순</div>
+                    <div class="dropdown-item" data-sort="date">🆕 최신순</div>
                 </div>
             </div>
         </div>
@@ -181,6 +189,7 @@
                     <div class="video-thumbnail">
                         ${video.thumbnail ? `<img src="${video.thumbnail}" alt="${video.title}">` : `<div>thumbnail</div>`}
                         ${contentBadge}
+                        ${video.isPopularChannel ? '<span class="popular-channel-badge">⭐ 인기 유튜버</span>' : ''}
                     </div>
                     <div class="video-info">
                         <div class="video-title">${video.title}</div>
@@ -237,6 +246,7 @@
                 languageMenu.classList.toggle('show');
                 // 다른 드롭다운 닫기
                 document.getElementById('contentTypeMenu').classList.remove('show');
+                document.getElementById('sortOrderMenu').classList.remove('show');
             });
             
             languageMenu.addEventListener('click', function(e) {
@@ -266,6 +276,7 @@
                 contentTypeMenu.classList.toggle('show');
                 // 다른 드롭다운 닫기
                 document.getElementById('languageMenu').classList.remove('show');
+                document.getElementById('sortOrderMenu').classList.remove('show');
             });
             
             contentTypeMenu.addEventListener('click', function(e) {
@@ -285,10 +296,41 @@
                 }
             });
             
+            // 정렬 옵션 드롭다운
+            const sortOrderDropdown = document.getElementById('sortOrderDropdown');
+            const sortOrderMenu = document.getElementById('sortOrderMenu');
+            const sortOrderLabel = document.getElementById('sortOrderLabel');
+            
+            sortOrderDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sortOrderMenu.classList.toggle('show');
+                // 다른 드롭다운 닫기
+                document.getElementById('languageMenu').classList.remove('show');
+                document.getElementById('contentTypeMenu').classList.remove('show');
+            });
+            
+            sortOrderMenu.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    // 이전 활성 항목 제거
+                    sortOrderMenu.querySelector('.active').classList.remove('active');
+                    // 새 항목 활성화
+                    e.target.classList.add('active');
+                    // 라벨 업데이트
+                    sortOrderLabel.textContent = e.target.textContent;
+                    // 정렬 옵션 변경
+                    currentSortOrder = e.target.dataset.sort;
+                    // 드롭다운 닫기
+                    sortOrderMenu.classList.remove('show');
+                    // 검색 실행
+                    performSearch();
+                }
+            });
+            
             // 외부 클릭시 드롭다운 닫기
             document.addEventListener('click', function() {
                 languageMenu.classList.remove('show');
                 contentTypeMenu.classList.remove('show');
+                sortOrderMenu.classList.remove('show');
             });
         }
     </script>
