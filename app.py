@@ -151,7 +151,7 @@ def simplify_search_query(query: str) -> str:
     print(f"검색어 간소화: '{query}' → '{simplified}'")
     return simplified
 
-def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, sortOrder='relevance', language=None, page_token=None, is_shorts=False, recent_month=True):
+def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, language=None, page_token=None, is_shorts=False, recent_month=True):
     youtube = get_youtube_service()
     if youtube is None:
         print("❌ YouTube 서비스를 사용할 수 없습니다.")
@@ -210,7 +210,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         'part': 'snippet',
         'maxResults': 50 if not is_shorts else 100,
         'type': 'video',
-        'order': 'viewCount' if sortOrder == 'viewCount' else 'date'  # 정렬 옵션 동적 적용
+        'order': 'viewCount'  # 인기순으로 고정
     }
     
     # 기본적으로 최근 한달 필터 적용
@@ -219,7 +219,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         published_after = one_month_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
         search_params['publishedAfter'] = published_after
         print(f"최근 한달 필터 적용: {published_after} 이후 영상만")
-    elif sortOrder == 'date':
+    elif search_params['order'] == 'date':
         # 최신순 정렬 시에는 최근 3개월로 범위 확장하여 더 많은 최신 영상 확보
         three_months_ago = datetime.now() - timedelta(days=90)
         published_after = three_months_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -259,7 +259,6 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 subcategory=subcategory, 
                 language=language, 
                 max_results=50,  # 더 많은 인기 유튜버 영상 (각 유튜버당 1개씩)
-                sortOrder=sortOrder,
                 recent_month=recent_month
             )
             print(f"인기 유튜버 영상 {len(popular_videos)}개 발견")
@@ -365,11 +364,8 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
             else:
                 print(f"⚠️ 중복 제외: {clean_channel_name}")
         
-        # 최종 정렬
-        if sortOrder == 'viewCount':
-            unique_videos.sort(key=lambda x: x['viewCount'], reverse=True)
-        elif sortOrder == 'date':
-            unique_videos.sort(key=lambda x: x['publishedAt'], reverse=True)
+        # 최종 정렬 (인기순으로 고정)
+        unique_videos.sort(key=lambda x: x['viewCount'], reverse=True)
         
         next_page_token = search_response.get('nextPageToken')
         print(f"🎯 최종 결과: 인기 유튜버 {len([v for v in unique_videos if v.get('isPopularChannel')])}개 + 일반 검색 {len([v for v in unique_videos if not v.get('isPopularChannel')])}개 = 총 {len(unique_videos)}개")
@@ -381,7 +377,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         print(f'YouTube API 오류: {e}')
         return {'videos': [], 'nextPageToken': None}
 
-def get_popular_channel_videos(category, subcategory, language='ko', max_results=20, sortOrder='viewCount', recent_month=True):
+def get_popular_channel_videos(category, subcategory, language='ko', max_results=20, recent_month=True):
     """인기 유튜버 채널에서 영상 가져오기 - 각 유튜버당 1개씩"""
     youtube = get_youtube_service()
     if youtube is None:
@@ -404,12 +400,12 @@ def get_popular_channel_videos(category, subcategory, language='ko', max_results
     # 각 유튜버당 1개씩 영상 가져오기
     for channel_id, channel_name, subscriber_count in channel_info_list:
         try:
-            # 채널의 영상 1개만 검색
+            # 채널의 영상 1개만 검색 (인기순으로 고정)
             search_params = {
                 'part': 'snippet',
                 'channelId': channel_id,
                 'maxResults': 5,  # 5개 중에서 조건에 맞는 1개 선택
-                'order': 'date' if sortOrder == 'date' else 'viewCount',
+                'order': 'viewCount',  # 인기순으로 고정
                 'type': 'video'
             }
             
@@ -469,12 +465,8 @@ def get_popular_channel_videos(category, subcategory, language='ko', max_results
             print(f"채널 검색 오류: {e}")
             continue
     
-    # 정렬: 인기순이면 구독자 수 순, 최신순이면 날짜 순
-    if sortOrder == 'viewCount':
-        # 구독자 수 순으로 정렬 (이미 리스트가 구독자 수 순이므로 순서 유지)
-        all_videos.sort(key=lambda x: x['subscriberCount'], reverse=True)
-    elif sortOrder == 'date':
-        all_videos.sort(key=lambda x: x['publishedAt'], reverse=True)
+    # 구독자 수 순으로 정렬 (인기순 고정)
+    all_videos.sort(key=lambda x: x['subscriberCount'], reverse=True)
     
     print(f"인기 유튜버 영상 수집 완료: {len(all_videos)}개 (각 유튜버당 1개씩)")
     return all_videos[:max_results]
@@ -493,7 +485,6 @@ def search():
     recent_month = request.form.get('recent_month', 'true').lower() == 'true'
     content_type = request.form.get('content_type', 'video')  # 'video' 또는 'shorts'
     is_shorts = content_type == 'shorts'
-    sortOrder = request.form.get('sortOrder', 'viewCount')
     
     # 페이지 1인 경우에만 실제 검색 수행, 그 외에는 캐시된 결과 사용
     if page == 1:
@@ -504,7 +495,6 @@ def search():
             language=language,
             recent_month=recent_month,
             is_shorts=is_shorts,
-            sortOrder=sortOrder,
             max_results=100  # 더 많은 결과를 한번에 가져옴
         )
         # 세션에 결과 저장 (간단한 캐싱)
@@ -512,7 +502,7 @@ def search():
         session['last_search_results'] = results
         session['last_search_params'] = {
             'query': query, 'category': category, 'subcategory': subcategory,
-            'language': language, 'sortOrder': sortOrder, 'content_type': content_type
+            'language': language, 'content_type': content_type
         }
     else:
         # 캐시된 결과 사용
