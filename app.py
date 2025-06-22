@@ -34,46 +34,46 @@ IS_PRODUCTION = os.getenv('VERCEL') or os.getenv('RAILWAY_ENVIRONMENT') or os.ge
 _llm_model = None
 _youtube = None
 
-# 교육 분야별 인기 유튜버 채널 ID 리스트
+# 교육 분야별 인기 유튜버 채널 ID 리스트 (구독자 수 순으로 정렬)
 POPULAR_EDUCATIONAL_CHANNELS = {
     'language': {
         'english': [
-            'UC0gkIRsU6C5NiWIbRjuGy8A',  # 야나두
-            'UCzGjO40hA1IMUOv-bTVlqyg',  # 라이브아카데미
-            'UCQzJm6xkGCvI4nJUVa6mFrw',  # 영어맨
-            'UC4Xe9ggYjNiKnPCBPKJZZww',  # 영어회화 100일의 기적
-            'UCfnlDaLDjhw8RlNrWU0sZmA',  # 진짜미국영어
+            ('UC0gkIRsU6C5NiWIbRjuGy8A', '야나두', 1500000),  # 야나두 - 150만
+            ('UCzGjO40hA1IMUOv-bTVlqyg', '라이브아카데미', 1200000),  # 라이브아카데미 - 120만
+            ('UCQzJm6xkGCvI4nJUVa6mFrw', '영어맨', 800000),  # 영어맨 - 80만
+            ('UC4Xe9ggYjNiKnPCBPKJZZww', '영어회화 100일의 기적', 600000),  # 영어회화 100일의 기적 - 60만
+            ('UCfnlDaLDjhw8RlNrWU0sZmA', '진짜미국영어', 400000),  # 진짜미국영어 - 40만
         ],
         'chinese': [
-            'UCPqgBhAKwh4Ql0K6gLVUzDg',  # 중국어맨
-            'UCqhTjsU5Hg7M4CpLGZd2qxQ',  # 차이홍
-            'UCMdz7wlsVhYfD6bwF1Nz5wQ',  # 중국어공부
+            ('UCPqgBhAKwh4Ql0K6gLVUzDg', '중국어맨', 300000),  # 중국어맨 - 30만
+            ('UCqhTjsU5Hg7M4CpLGZd2qxQ', '차이홍', 200000),  # 차이홍 - 20만
+            ('UCMdz7wlsVhYfD6bwF1Nz5wQ', '중국어공부', 150000),  # 중국어공부 - 15만
         ],
         'japanese': [
-            'UCVx6RFaEAg46xfAsD2zz16w',  # 일본어맨
-            'UCgqHDxKzjgJGdFTCgLbGVig',  # 히라가나
-            'UCOPCJJgHfKdVYGNJBKWuPmg',  # 일본어공부
+            ('UCVx6RFaEAg46xfAsD2zz16w', '일본어맨', 250000),  # 일본어맨 - 25만
+            ('UCgqHDxKzjgJGdFTCgLbGVig', '히라가나', 180000),  # 히라가나 - 18만
+            ('UCOPCJJgHfKdVYGNJBKWuPmg', '일본어공부', 120000),  # 일본어공부 - 12만
         ]
     },
     'programming': [
-        'UCUpJs89fSBXNolQGOYKn0YQ',  # 코딩애플
-        'UCqMTJfbOZ5XLs8JwKWjVhzQ',  # 생활코딩
-        'UCGhqkImhurjuEr3KKLBSqpg',  # 노마드코더
-        'UC7iAOLiALt2rtMVAWWl4pnw',  # 드림코딩
-        'UCQjrcbAYBAHFKoNKnbzfJbA',  # 조코딩
-        'UCZ30aWiMw5C8mGcESlAGQdA',  # 빵형의 개발도상국
+        ('UCUpJs89fSBXNolQGOYKn0YQ', '코딩애플', 800000),  # 코딩애플 - 80만
+        ('UCqMTJfbOZ5XLs8JwKWjVhzQ', '생활코딩', 600000),  # 생활코딩 - 60만
+        ('UCGhqkImhurjuEr3KKLBSqpg', '노마드코더', 500000),  # 노마드코더 - 50만
+        ('UC7iAOLiALt2rtMVAWWl4pnw', '드림코딩', 400000),  # 드림코딩 - 40만
+        ('UCQjrcbAYBAHFKoNKnbzfJbA', '조코딩', 350000),  # 조코딩 - 35만
+        ('UCZ30aWiMw5C8mGcESlAGQdA', '빵형의 개발도상국', 300000),  # 빵형의 개발도상국 - 30만
     ],
     'hobby': [
-        'UCYEf5JPp4JzMIKnlyRCVNKg',  # 쿠킹트리
-        'UCOxqgCwjGl5T4N-5UbdNWKg',  # 백종원의 요리비책
-        'UCnM1fLy1qRKuSP3bFVqSMOQ',  # 혼밥연구소
-        'UCzDMwOYYgdymd8NfKTJSaiA',  # 그림그리기
+        ('UCOxqgCwjGl5T4N-5UbdNWKg', '백종원의 요리비책', 2000000),  # 백종원의 요리비책 - 200만
+        ('UCYEf5JPp4JzMIKnlyRCVNKg', '쿠킹트리', 1500000),  # 쿠킹트리 - 150만
+        ('UCnM1fLy1qRKuSP3bFVqSMOQ', '혼밥연구소', 800000),  # 혼밥연구소 - 80만
+        ('UCzDMwOYYgdymd8NfKTJSaiA', '그림그리기', 300000),  # 그림그리기 - 30만
     ],
     'certificate': [
-        'UCpOG7oIiJNXi7pjqjkYVFdQ',  # 해커스토익
-        'UCKvqhQYh3YKMaEOQGxdgFBQ',  # 토익스피킹
-        'UCKr6B9tSP8YvPFNgFjj7nKQ',  # 컴활
-        'UC9-y-6csu5WGm29I7JiwpnA',  # 정보처리기사
+        ('UCpOG7oIiJNXi7pjqjkYVFdQ', '해커스토익', 400000),  # 해커스토익 - 40만
+        ('UCKvqhQYh3YKMaEOQGxdgFBQ', '토익스피킹', 200000),  # 토익스피킹 - 20만
+        ('UCKr6B9tSP8YvPFNgFjj7nKQ', '컴활', 150000),  # 컴활 - 15만
+        ('UC9-y-6csu5WGm29I7JiwpnA', '정보처리기사', 100000),  # 정보처리기사 - 10만
     ]
 }
 
@@ -258,13 +258,14 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 category=category, 
                 subcategory=subcategory, 
                 language=language, 
-                max_results=max(10, max_results // 3),  # 전체의 1/3 정도
+                max_results=50,  # 더 많은 인기 유튜버 영상 (각 유튜버당 1개씩)
                 sortOrder=sortOrder,
                 recent_month=recent_month
             )
             print(f"인기 유튜버 영상 {len(popular_videos)}개 발견")
         
-        # 2단계: 일반 YouTube 검색
+        # 2단계: 일반 YouTube 검색 (인기 유튜버 영상이 많으면 일반 검색 줄임)
+        general_search_count = max(20, max_results - len(popular_videos))
         search_response = youtube.search().list(**search_params).execute()
         videos = []
         for item in search_response.get('items', []):
@@ -325,7 +326,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                     'viewCount': views,
                     'isPopularChannel': False
                 })
-                if len(videos) >= max_results - len(popular_videos):  # 인기 유튜버 영상 수만큼 빼고 검색
+                if len(videos) >= general_search_count:  # 인기 유튜버 영상 수만큼 빼고 검색
                     break
             except Exception as e:
                 print(f"비디오 정보 처리 오류: {e}")
@@ -359,31 +360,33 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         return {'videos': [], 'nextPageToken': None}
 
 def get_popular_channel_videos(category, subcategory, language='ko', max_results=20, sortOrder='viewCount', recent_month=True):
-    """인기 유튜버 채널에서 영상 가져오기"""
+    """인기 유튜버 채널에서 영상 가져오기 - 각 유튜버당 1개씩"""
     youtube = get_youtube_service()
     if youtube is None:
         return []
     
-    # 카테고리별 채널 ID 가져오기
-    channel_ids = []
+    # 카테고리별 채널 정보 가져오기 (채널ID, 이름, 구독자수)
+    channel_info_list = []
     if category == 'language' and subcategory in POPULAR_EDUCATIONAL_CHANNELS['language']:
-        channel_ids = POPULAR_EDUCATIONAL_CHANNELS['language'][subcategory]
+        channel_info_list = POPULAR_EDUCATIONAL_CHANNELS['language'][subcategory]
     elif category in POPULAR_EDUCATIONAL_CHANNELS:
-        channel_ids = POPULAR_EDUCATIONAL_CHANNELS[category]
+        channel_info_list = POPULAR_EDUCATIONAL_CHANNELS[category]
     
-    if not channel_ids:
+    if not channel_info_list:
         return []
     
-    print(f"인기 유튜버 채널에서 검색 중: {len(channel_ids)}개 채널")
+    print(f"인기 유튜버 채널에서 검색 중: {len(channel_info_list)}개 채널")
     
     all_videos = []
-    for channel_id in channel_ids[:3]:  # 상위 3개 채널만 검색
+    
+    # 각 유튜버당 1개씩 영상 가져오기
+    for channel_id, channel_name, subscriber_count in channel_info_list:
         try:
-            # 채널의 최신 영상들 검색
+            # 채널의 영상 1개만 검색
             search_params = {
                 'part': 'snippet',
                 'channelId': channel_id,
-                'maxResults': 10,
+                'maxResults': 5,  # 5개 중에서 조건에 맞는 1개 선택
                 'order': 'date' if sortOrder == 'date' else 'viewCount',
                 'type': 'video'
             }
@@ -395,6 +398,7 @@ def get_popular_channel_videos(category, subcategory, language='ko', max_results
             
             search_response = youtube.search().list(**search_params).execute()
             
+            # 이 채널에서 첫 번째 유효한 영상 1개만 가져오기
             for item in search_response.get('items', []):
                 video_id = item['id']['videoId']
                 try:
@@ -424,33 +428,33 @@ def get_popular_channel_videos(category, subcategory, language='ko', max_results
                         'description': item['snippet']['description'][:200] + '...' if len(item['snippet']['description']) > 200 else item['snippet']['description'],
                         'thumbnail': item['snippet']['thumbnails']['high']['url'],
                         'videoId': video_id,
-                        'channelTitle': item['snippet']['channelTitle'] + ' ⭐',  # 인기 유튜버 표시
+                        'channelTitle': channel_name + ' ⭐',  # 미리 저장된 채널명 사용
                         'publishedAt': formatted_published_date,
                         'duration': parsed_duration,
                         'viewCount': views,
-                        'isPopularChannel': True  # 인기 채널 표시
+                        'isPopularChannel': True,
+                        'subscriberCount': subscriber_count  # 구독자 수 추가
                     })
                     
-                    if len(all_videos) >= max_results:
-                        break
+                    # 이 채널에서는 1개만 가져오므로 break
+                    break
                         
                 except Exception as e:
                     print(f"비디오 정보 처리 오류: {e}")
                     continue
-            
-            if len(all_videos) >= max_results:
-                break
                 
         except Exception as e:
             print(f"채널 검색 오류: {e}")
             continue
     
-    # 정렬
+    # 정렬: 인기순이면 구독자 수 순, 최신순이면 날짜 순
     if sortOrder == 'viewCount':
-        all_videos.sort(key=lambda x: x['viewCount'], reverse=True)
+        # 구독자 수 순으로 정렬 (이미 리스트가 구독자 수 순이므로 순서 유지)
+        all_videos.sort(key=lambda x: x['subscriberCount'], reverse=True)
     elif sortOrder == 'date':
         all_videos.sort(key=lambda x: x['publishedAt'], reverse=True)
     
+    print(f"인기 유튜버 영상 수집 완료: {len(all_videos)}개 (각 유튜버당 1개씩)")
     return all_videos[:max_results]
 
 @app.route('/')
@@ -467,18 +471,32 @@ def search():
     recent_month = request.form.get('recent_month', 'true').lower() == 'true'
     content_type = request.form.get('content_type', 'video')  # 'video' 또는 'shorts'
     is_shorts = content_type == 'shorts'
-    sortOrder = request.form.get('sortOrder', 'relevance')
+    sortOrder = request.form.get('sortOrder', 'viewCount')
     
-    results = search_youtube_videos(
-        query=query,
-        category=category,
-        subcategory=subcategory,
-        language=language,
-        recent_month=recent_month,
-        is_shorts=is_shorts,
-        sortOrder=sortOrder,
-        page_token=None if page == 1 else f"page_{page}"
-    )
+    # 페이지 1인 경우에만 실제 검색 수행, 그 외에는 캐시된 결과 사용
+    if page == 1:
+        results = search_youtube_videos(
+            query=query,
+            category=category,
+            subcategory=subcategory,
+            language=language,
+            recent_month=recent_month,
+            is_shorts=is_shorts,
+            sortOrder=sortOrder,
+            max_results=100  # 더 많은 결과를 한번에 가져옴
+        )
+        # 세션에 결과 저장 (간단한 캐싱)
+        from flask import session
+        session['last_search_results'] = results
+        session['last_search_params'] = {
+            'query': query, 'category': category, 'subcategory': subcategory,
+            'language': language, 'sortOrder': sortOrder, 'content_type': content_type
+        }
+    else:
+        # 캐시된 결과 사용
+        from flask import session
+        results = session.get('last_search_results', {'videos': [], 'nextPageToken': None})
+    
     return jsonify(results)
 
 @app.route('/categories')
