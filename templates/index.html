@@ -100,6 +100,8 @@
         let currentSortOrder = 'viewCount';
         let currentLang = 'ko';
         let currentContentType = 'video'; // 기본값: 비디오
+        let allVideos = []; // 전체 영상 데이터 저장
+        let videosPerPage = 8; // 페이지당 영상 수
         
         const categoryData = {
             language: ['영어', '중국어', '일본어'],
@@ -146,11 +148,12 @@
             document.getElementById('emptyState').style.display = 'none';
             const searchQuery = document.getElementById('searchInput').value.trim();
             
+            // 새로운 검색인 경우에만 서버에 요청
             const formData = new FormData();
             formData.append('query', searchQuery || '');
             formData.append('category', currentCategory);
             formData.append('subcategory', currentSubcategory);
-            formData.append('page', currentPage);
+            formData.append('page', 1); // 항상 1페이지로 요청
             formData.append('sortOrder', currentSortOrder);
             formData.append('language', currentLang);
             formData.append('recent_month', 'true'); // 기본값: 최근 한달
@@ -160,23 +163,37 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success !== false && data.videos && data.videos.length > 0) {
-                    displayResults(data.videos);
+                    allVideos = data.videos; // 모든 영상 데이터 저장
+                    currentPage = 1; // 페이지를 1로 리셋
+                    displayCurrentPage(); // 현재 페이지 표시
+                    setupPagination(); // 페이지네이션 설정
                 } else {
+                    allVideos = [];
                     showEmptyState();
                 }
                 isLoading = false;
             })
             .catch(error => {
+                allVideos = [];
                 showEmptyState();
                 isLoading = false;
             });
         }
-        function displayResults(videos) {
+        
+        // 현재 페이지의 영상들만 표시
+        function displayCurrentPage() {
             const videoList = document.getElementById('videoList');
-            const emptyState = document.getElementById('emptyState');
-            emptyState.style.display = 'none';
+            const startIndex = (currentPage - 1) * videosPerPage;
+            const endIndex = startIndex + videosPerPage;
+            const pageVideos = allVideos.slice(startIndex, endIndex);
+            
+            if (pageVideos.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
             videoList.innerHTML = '';
-            videos.forEach(video => {
+            pageVideos.forEach(video => {
                 const card = document.createElement('div');
                 card.className = 'video-card';
                 
@@ -204,6 +221,32 @@
                 videoList.appendChild(card);
             });
         }
+        
+        // 페이지네이션 설정
+        function setupPagination() {
+            const totalPages = Math.ceil(allVideos.length / videosPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            
+            // 기존 페이지 버튼들 업데이트
+            const pageButtons = pagination.querySelectorAll('.page-number');
+            pageButtons.forEach((btn, index) => {
+                const pageNum = index + 1;
+                if (pageNum <= totalPages) {
+                    btn.style.display = 'block';
+                    btn.classList.toggle('active', pageNum === currentPage);
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+        
         function showEmptyState() {
             document.getElementById('videoList').innerHTML = '';
             document.getElementById('emptyState').style.display = 'block';
@@ -216,10 +259,12 @@
         });
         document.querySelectorAll('.page-number').forEach(pageBtn => {
             pageBtn.addEventListener('click', function() {
+                if (allVideos.length === 0) return; // 데이터가 없으면 무시
+                
                 document.querySelectorAll('.page-number').forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
                 currentPage = parseInt(this.dataset.page);
-                performSearch();
+                displayCurrentPage(); // 클라이언트 사이드에서 페이지 표시
             });
         });
         document.addEventListener('DOMContentLoaded', function() {
