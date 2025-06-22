@@ -166,14 +166,14 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                 query = 'english grammar conversation tutorial education'
         elif category == 'language' and subcategory == 'chinese':
             if language == 'ko':
-                query = '중국어 회화 문법 공부 강의 한국어 설명 교육 중국어배우기'  # 중국어 학습 키워드
+                query = '중국어 회화 문법 공부 강의 한국어 설명 교육 중국어 배우기'
             else:
-                query = 'chinese mandarin grammar conversation tutorial education learn chinese'
+                query = 'chinese language learning grammar conversation tutorial'
         elif category == 'language' and subcategory == 'japanese':
             if language == 'ko':
-                query = '일본어 회화 문법 공부 강의 한국어 설명 교육 일본어배우기'  # 일본어 학습 키워드
+                query = '일본어 회화 문법 공부 강의 한국어 설명 교육 일본어 배우기'
             else:
-                query = 'japanese grammar conversation tutorial education learn japanese'
+                query = 'japanese language learning grammar conversation tutorial'
         elif category == 'programming':
             if language == 'ko':
                 query = '프로그래밍 강의 코딩 배우기 한국어 교육 튜토리얼'  # 교육 키워드 추가
