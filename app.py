@@ -34,6 +34,49 @@ IS_PRODUCTION = os.getenv('VERCEL') or os.getenv('RAILWAY_ENVIRONMENT') or os.ge
 _llm_model = None
 _youtube = None
 
+# 교육 분야별 인기 유튜버 채널 ID 리스트
+POPULAR_EDUCATIONAL_CHANNELS = {
+    'language': {
+        'english': [
+            'UC0gkIRsU6C5NiWIbRjuGy8A',  # 야나두
+            'UCzGjO40hA1IMUOv-bTVlqyg',  # 라이브아카데미
+            'UCQzJm6xkGCvI4nJUVa6mFrw',  # 영어맨
+            'UC4Xe9ggYjNiKnPCBPKJZZww',  # 영어회화 100일의 기적
+            'UCfnlDaLDjhw8RlNrWU0sZmA',  # 진짜미국영어
+        ],
+        'chinese': [
+            'UCPqgBhAKwh4Ql0K6gLVUzDg',  # 중국어맨
+            'UCqhTjsU5Hg7M4CpLGZd2qxQ',  # 차이홍
+            'UCMdz7wlsVhYfD6bwF1Nz5wQ',  # 중국어공부
+        ],
+        'japanese': [
+            'UCVx6RFaEAg46xfAsD2zz16w',  # 일본어맨
+            'UCgqHDxKzjgJGdFTCgLbGVig',  # 히라가나
+            'UCOPCJJgHfKdVYGNJBKWuPmg',  # 일본어공부
+        ]
+    },
+    'programming': [
+        'UCUpJs89fSBXNolQGOYKn0YQ',  # 코딩애플
+        'UCqMTJfbOZ5XLs8JwKWjVhzQ',  # 생활코딩
+        'UCGhqkImhurjuEr3KKLBSqpg',  # 노마드코더
+        'UC7iAOLiALt2rtMVAWWl4pnw',  # 드림코딩
+        'UCQjrcbAYBAHFKoNKnbzfJbA',  # 조코딩
+        'UCZ30aWiMw5C8mGcESlAGQdA',  # 빵형의 개발도상국
+    ],
+    'hobby': [
+        'UCYEf5JPp4JzMIKnlyRCVNKg',  # 쿠킹트리
+        'UCOxqgCwjGl5T4N-5UbdNWKg',  # 백종원의 요리비책
+        'UCnM1fLy1qRKuSP3bFVqSMOQ',  # 혼밥연구소
+        'UCzDMwOYYgdymd8NfKTJSaiA',  # 그림그리기
+    ],
+    'certificate': [
+        'UCpOG7oIiJNXi7pjqjkYVFdQ',  # 해커스토익
+        'UCKvqhQYh3YKMaEOQGxdgFBQ',  # 토익스피킹
+        'UCKr6B9tSP8YvPFNgFjj7nKQ',  # 컴활
+        'UC9-y-6csu5WGm29I7JiwpnA',  # 정보처리기사
+    ]
+}
+
 def get_youtube_service():
     global _youtube
     if _youtube is None:
@@ -167,7 +210,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         'part': 'snippet',
         'maxResults': 50 if not is_shorts else 100,
         'type': 'video',
-        'order': 'viewCount'  # 인기순으로 고정
+        'order': 'viewCount' if sortOrder == 'viewCount' else 'date'  # 정렬 옵션 동적 적용
     }
     
     # 기본적으로 최근 한달 필터 적용
@@ -176,6 +219,12 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         published_after = one_month_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
         search_params['publishedAfter'] = published_after
         print(f"최근 한달 필터 적용: {published_after} 이후 영상만")
+    elif sortOrder == 'date':
+        # 최신순 정렬 시에는 최근 3개월로 범위 확장하여 더 많은 최신 영상 확보
+        three_months_ago = datetime.now() - timedelta(days=90)
+        published_after = three_months_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+        search_params['publishedAfter'] = published_after
+        print(f"최신순 검색: 최근 3개월 ({published_after}) 이후 영상 검색")
     
     if page_token:
         search_params['pageToken'] = page_token
@@ -202,6 +251,20 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
             search_params['videoDuration'] = 'long'
     print(f"YouTube API 검색 파라미터: {search_params}")
     try:
+        # 1단계: 인기 유튜버 채널에서 영상 가져오기 (전체 결과의 30% 정도)
+        popular_videos = []
+        if not query:  # 기본 검색인 경우에만 인기 유튜버 영상 포함
+            popular_videos = get_popular_channel_videos(
+                category=category, 
+                subcategory=subcategory, 
+                language=language, 
+                max_results=max(10, max_results // 3),  # 전체의 1/3 정도
+                sortOrder=sortOrder,
+                recent_month=recent_month
+            )
+            print(f"인기 유튜버 영상 {len(popular_videos)}개 발견")
+        
+        # 2단계: 일반 YouTube 검색
         search_response = youtube.search().list(**search_params).execute()
         videos = []
         for item in search_response.get('items', []):
@@ -259,21 +322,136 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
                     'channelTitle': item['snippet']['channelTitle'],
                     'publishedAt': formatted_published_date,
                     'duration': parsed_duration,
-                    'viewCount': views
+                    'viewCount': views,
+                    'isPopularChannel': False
                 })
-                if len(videos) >= max_results:
+                if len(videos) >= max_results - len(popular_videos):  # 인기 유튜버 영상 수만큼 빼고 검색
                     break
             except Exception as e:
                 print(f"비디오 정보 처리 오류: {e}")
                 continue
+        
+        # 3단계: 인기 유튜버 영상과 일반 영상 혼합
+        all_videos = popular_videos + videos
+        
+        # 중복 제거 (같은 videoId)
+        seen_ids = set()
+        unique_videos = []
+        for video in all_videos:
+            if video['videoId'] not in seen_ids:
+                seen_ids.add(video['videoId'])
+                unique_videos.append(video)
+        
+        # 최종 정렬
+        if sortOrder == 'viewCount':
+            unique_videos.sort(key=lambda x: x['viewCount'], reverse=True)
+        elif sortOrder == 'date':
+            unique_videos.sort(key=lambda x: x['publishedAt'], reverse=True)
+        
         next_page_token = search_response.get('nextPageToken')
+        print(f"최종 결과: 인기 유튜버 {len(popular_videos)}개 + 일반 검색 {len(videos)}개 = 총 {len(unique_videos)}개")
         return {
-            'videos': videos,
+            'videos': unique_videos[:max_results],
             'nextPageToken': next_page_token
         }
     except HttpError as e:
         print(f'YouTube API 오류: {e}')
         return {'videos': [], 'nextPageToken': None}
+
+def get_popular_channel_videos(category, subcategory, language='ko', max_results=20, sortOrder='viewCount', recent_month=True):
+    """인기 유튜버 채널에서 영상 가져오기"""
+    youtube = get_youtube_service()
+    if youtube is None:
+        return []
+    
+    # 카테고리별 채널 ID 가져오기
+    channel_ids = []
+    if category == 'language' and subcategory in POPULAR_EDUCATIONAL_CHANNELS['language']:
+        channel_ids = POPULAR_EDUCATIONAL_CHANNELS['language'][subcategory]
+    elif category in POPULAR_EDUCATIONAL_CHANNELS:
+        channel_ids = POPULAR_EDUCATIONAL_CHANNELS[category]
+    
+    if not channel_ids:
+        return []
+    
+    print(f"인기 유튜버 채널에서 검색 중: {len(channel_ids)}개 채널")
+    
+    all_videos = []
+    for channel_id in channel_ids[:3]:  # 상위 3개 채널만 검색
+        try:
+            # 채널의 최신 영상들 검색
+            search_params = {
+                'part': 'snippet',
+                'channelId': channel_id,
+                'maxResults': 10,
+                'order': 'date' if sortOrder == 'date' else 'viewCount',
+                'type': 'video'
+            }
+            
+            if recent_month:
+                one_month_ago = datetime.now() - timedelta(days=30)
+                published_after = one_month_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+                search_params['publishedAfter'] = published_after
+            
+            search_response = youtube.search().list(**search_params).execute()
+            
+            for item in search_response.get('items', []):
+                video_id = item['id']['videoId']
+                try:
+                    # 비디오 상세 정보 가져오기
+                    video_response = youtube.videos().list(
+                        part='contentDetails,statistics',
+                        id=video_id
+                    ).execute()
+                    
+                    if not video_response['items']:
+                        continue
+                        
+                    video_details = video_response['items'][0]
+                    duration_str = video_details['contentDetails']['duration']
+                    parsed_duration = parse_duration(duration_str)
+                    duration_seconds = parse_duration_to_seconds(duration_str)
+                    views = int(video_details['statistics'].get('viewCount', 0))
+                    published_at = item['snippet']['publishedAt']
+                    formatted_published_date = format_published_date(published_at)
+                    
+                    # 60초 미만 영상 제외 (쇼츠 제외)
+                    if duration_seconds < 60:
+                        continue
+                    
+                    all_videos.append({
+                        'title': item['snippet']['title'],
+                        'description': item['snippet']['description'][:200] + '...' if len(item['snippet']['description']) > 200 else item['snippet']['description'],
+                        'thumbnail': item['snippet']['thumbnails']['high']['url'],
+                        'videoId': video_id,
+                        'channelTitle': item['snippet']['channelTitle'] + ' ⭐',  # 인기 유튜버 표시
+                        'publishedAt': formatted_published_date,
+                        'duration': parsed_duration,
+                        'viewCount': views,
+                        'isPopularChannel': True  # 인기 채널 표시
+                    })
+                    
+                    if len(all_videos) >= max_results:
+                        break
+                        
+                except Exception as e:
+                    print(f"비디오 정보 처리 오류: {e}")
+                    continue
+            
+            if len(all_videos) >= max_results:
+                break
+                
+        except Exception as e:
+            print(f"채널 검색 오류: {e}")
+            continue
+    
+    # 정렬
+    if sortOrder == 'viewCount':
+        all_videos.sort(key=lambda x: x['viewCount'], reverse=True)
+    elif sortOrder == 'date':
+        all_videos.sort(key=lambda x: x['publishedAt'], reverse=True)
+    
+    return all_videos[:max_results]
 
 @app.route('/')
 def index():
@@ -289,6 +467,7 @@ def search():
     recent_month = request.form.get('recent_month', 'true').lower() == 'true'
     content_type = request.form.get('content_type', 'video')  # 'video' 또는 'shorts'
     is_shorts = content_type == 'shorts'
+    sortOrder = request.form.get('sortOrder', 'relevance')
     
     results = search_youtube_videos(
         query=query,
@@ -297,6 +476,7 @@ def search():
         language=language,
         recent_month=recent_month,
         is_shorts=is_shorts,
+        sortOrder=sortOrder,
         page_token=None if page == 1 else f"page_{page}"
     )
     return jsonify(results)
