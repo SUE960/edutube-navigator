@@ -123,6 +123,15 @@
             performSearch();
         });
         
+        document.querySelectorAll('.subcategory-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentSubcategory = this.dataset.subcategory;
+                performSearch();
+            });
+        });
+        
         function updateSubcategories(category) {
             const items = categoryData[category] || [];
             const subRow = document.querySelector('.subcategory-row');
