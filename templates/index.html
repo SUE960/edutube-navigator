@@ -1,391 +1,287 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduTube Navigator - YOUTUBE 학습 큐레이터</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTube Navigator - YOUTUBE 학습 큐레이터</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
-    <!-- 최상단 검은 띠 배너 -->
-    <div class="top-banner">
-        🔥 한국 최근 한달 인기 교육 영상 큐레이션 AI가 엄선한 고품질 학습 콘텐츠를 만나보세요
+  <!-- 최상단 검은 띠 배너 -->
+  <div class="top-banner">
+    🔥 AI가 엄선한 고품질 교육 콘텐츠를 만나보세요
+  </div>
+  
+  <div class="main-container">
+    <h1 class="logo">EduTube</h1>
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요" />
     </div>
-    
-    <div class="main-container">
-        <!-- 로고 -->
-        <h1 class="logo">EduTube</h1>
-        
-        <!-- 검색 영역 -->
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" id="searchInput" placeholder="검색어를 입력하세요">
-        </div>
-        
-        <!-- 카테고리 버튼들 -->
-        <div class="category-row">
-            <button class="category-btn active" data-category="language">Language</button>
-            <button class="category-btn" data-category="programming">Programming</button>
-            <button class="category-btn" data-category="hobby">Hobby</button>
-            <button class="category-btn" data-category="certificate">Certificate</button>
-            <button class="category-btn" data-category="etc">Etc</button>
-        </div>
-        
-        <!-- 하위 카테고리 -->
-        <div class="language-tabs subcategory-row">
-            <button class="subcategory-btn active" data-subcategory="english">영어</button>
-            <button class="subcategory-btn" data-subcategory="chinese">중국어</button>
-            <button class="subcategory-btn" data-subcategory="japanese">일본어</button>
-        </div>
-        
-        <!-- 영상 언어 선택 & 콘텐츠 타입 선택 -->
-        <div class="filter-controls">
-            <div class="filter-group dropdown" id="languageDropdown">
-                <span class="filter-icon">▼</span>
-                <span class="filter-label" id="languageLabel">한국어</span>
-                <div class="dropdown-menu" id="languageMenu">
-                    <div class="dropdown-item active" data-lang="ko">한국어</div>
-                    <div class="dropdown-item" data-lang="en">영어</div>
-                </div>
-            </div>
-            <div class="filter-group dropdown" id="contentTypeDropdown">
-                <span class="filter-icon">▼</span>
-                <span class="filter-label" id="contentTypeLabel">비디오</span>
-                <div class="dropdown-menu" id="contentTypeMenu">
-                    <div class="dropdown-item active" data-type="video">비디오</div>
-                    <div class="dropdown-item" data-type="shorts">쇼츠</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 비디오 리스트 -->
-        <div class="video-list" id="videoList">
-            <!-- 비디오 카드들이 여기에 동적으로 추가됩니다 -->
-        </div>
-        <!-- 로딩 스피너 -->
-        <div class="loading-spinner" id="loadingSpinner" style="display:none;">
-            <div class="spinner"></div>
-        </div>
-        <!-- 빈 상태 -->
-        <div class="empty-state" id="emptyState" style="display:none;">
-            <i class="fas fa-search"></i>
-            <h3>검색 결과가 없습니다</h3>
-            <p>다른 키워드로 검색해보세요</p>
-        </div>
-        <!-- 페이지네이션 -->
-        <div class="pagination" id="pagination">
-            <button class="page-number" data-page="prev">‹ 이전</button>
-            <button class="page-number active" data-page="1">1</button>
-            <button class="page-number" data-page="2">2</button>
-            <button class="page-number" data-page="3">3</button>
-            <button class="page-number" data-page="4">4</button>
-            <button class="page-number" data-page="5">5</button>
-            <button class="page-number" data-page="6">6</button>
-            <button class="page-number" data-page="7">7</button>
-            <button class="page-number" data-page="8">8</button>
-            <button class="page-number" data-page="next">다음 ›</button>
-        </div>
+    <div class="category-row">
+      <button class="category-btn active" data-category="language">Language</button>
+      <button class="category-btn" data-category="programming">Programming</button>
+      <button class="category-btn" data-category="hobby">Hobby</button>
+      <button class="category-btn" data-category="certificate">Certificate</button>
+      <button class="category-btn" data-category="etc">Etc</button>
     </div>
-    <!-- 사이드바/오버레이 등은 필요시 추가 -->
-    <script>
-        // 기존 JS 코드 유지 (카테고리, 검색, 결과 표시 등)
-        let currentCategory = 'programming';
-        let currentSubcategory = 'python';
-        let currentPage = 1;
-        let isLoading = false;
-        let currentLang = 'ko';
-        let currentContentType = 'video'; // 기본값: 비디오
-        let allVideos = []; // 전체 영상 데이터 저장
-        let videosPerPage = 8; // 페이지당 영상 수
-        
-        const categoryData = {
-            language: ['영어', '중국어', '일본어'],
-            programming: ['Python', 'JavaScript', '웹개발', '데이터분석'],
-            hobby: ['취미', '운동', '요리', '여행'],
-            certificate: ['토익', '토플', '컴활', '정보처리기사'],
-            etc: ['기타', '교양', '상식']
+    <div class="subcategory-row subcategory-row"></div>
+    <div class="filter-controls">
+      <div class="filter-group dropdown" id="languageDropdown">
+        <span class="filter-icon">▼</span>
+        <span class="filter-label" id="languageLabel">한국어</span>
+        <div class="dropdown-menu" id="languageMenu">
+          <div class="dropdown-item active" data-lang="ko">한국어</div>
+          <div class="dropdown-item" data-lang="en">영어</div>
+        </div>
+      </div>
+      <div class="filter-group dropdown" id="contentTypeDropdown">
+        <span class="filter-icon">▼</span>
+        <span class="filter-label" id="contentTypeLabel">비디오</span>
+        <div class="dropdown-menu" id="contentTypeMenu">
+          <div class="dropdown-item active" data-type="video">비디오</div>
+          <div class="dropdown-item" data-type="shorts">쇼츠</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="video-list" id="videoList"></div>
+    <div class="loading-spinner" id="loadingSpinner" style="display:none;">
+      <div class="spinner"></div>
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <i class="fas fa-search"></i>
+      <h3>검색 결과가 없습니다</h3>
+      <p>다른 키워드로 검색해보세요</p>
+    </div>
+    <div class="pagination" id="pagination">
+      <button class="page-number" data-page="prev">‹ 이전</button>
+      <button class="page-number active" data-page="1">1</button>
+      <button class="page-number" data-page="2">2</button>
+      <button class="page-number" data-page="3">3</button>
+      <button class="page-number" data-page="4">4</button>
+      <button class="page-number" data-page="5">5</button>
+      <button class="page-number" data-page="6">6</button>
+      <button class="page-number" data-page="7">7</button>
+      <button class="page-number" data-page="8">8</button>
+      <button class="page-number" data-page="next">다음 ›</button>
+    </div>
+  </div>
+
+  <script>
+    let currentCategory = 'language';
+    let currentSubcategory = 'english';
+    let currentPage = 1;
+    let isLoading = false;
+    let currentLang = 'ko';
+    let currentContentType = 'video';
+    let allVideos = [];
+    let videosPerPage = 8;
+
+    const categoryData = {
+      language: ['영어', '중국어', '일본어'],
+      programming: ['Python', 'JavaScript', '웹개발', '데이터분석'],
+      hobby: ['취미', '운동', '요리', '여행'],
+      certificate: ['토익', '토플', '컴활', '정보처리기사'],
+      etc: ['기타', '교양', '상식']
+    };
+
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentCategory = this.dataset.category;
+        updateSubcategories(currentCategory);
+        performSearch();
+      });
+    });
+
+    function updateSubcategories(category) {
+      const items = categoryData[category] || [];
+      const subRow = document.querySelector('.subcategory-row');
+      subRow.innerHTML = '';
+      items.forEach((item, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'subcategory-btn' + (idx === 0 ? ' active' : '');
+        btn.dataset.subcategory = item.toLowerCase();
+        btn.textContent = item;
+        btn.onclick = function () {
+          document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentSubcategory = this.dataset.subcategory;
+          performSearch();
         };
-        
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.dataset.category;
-                updateSubcategories(currentCategory);
-                performSearch();
-            });
+        subRow.appendChild(btn);
+      });
+      if (items.length > 0) currentSubcategory = items[0].toLowerCase();
+    }
+
+    function performSearch() {
+      if (isLoading) return;
+      isLoading = true;
+      document.getElementById('videoList').innerHTML = '';
+      document.getElementById('emptyState').style.display = 'none';
+      const searchQuery = document.getElementById('searchInput').value.trim();
+
+      const formData = new FormData();
+      formData.append('query', searchQuery || '');
+      formData.append('category', currentCategory);
+      formData.append('subcategory', currentSubcategory);
+      formData.append('page', 1);
+      formData.append('language', currentLang);
+      formData.append('content_type', currentContentType);
+
+      fetch('/search', { method: 'POST', body: formData })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success !== false && data.videos && data.videos.length > 0) {
+            allVideos = data.videos.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+            currentPage = 1;
+            displayCurrentPage();
+            setupPagination();
+          } else {
+            allVideos = [];
+            showEmptyState();
+          }
+          isLoading = false;
+        })
+        .catch(error => {
+          allVideos = [];
+          showEmptyState();
+          isLoading = false;
         });
-        
-        document.querySelector('.category-btn[data-category="programming"]').addEventListener('click', function() {
-            currentCategory = 'programming';
-            currentSubcategory = 'python';
-            performSearch();
-        });
-        
-        document.querySelectorAll('.subcategory-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentSubcategory = this.dataset.subcategory;
-                performSearch();
-            });
-        });
-        
-        function updateSubcategories(category) {
-            const items = categoryData[category] || [];
-            const subRow = document.querySelector('.subcategory-row');
-            subRow.innerHTML = '';
-            items.forEach((item, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'subcategory-btn' + (idx === 0 ? ' active' : '');
-                btn.dataset.subcategory = item.toLowerCase();
-                btn.textContent = item;
-                btn.onclick = function() {
-                    document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentSubcategory = this.dataset.subcategory;
-                    performSearch();
-                };
-                subRow.appendChild(btn);
-            });
-            if (items.length > 0) currentSubcategory = items[0].toLowerCase();
+    }
+
+    function displayCurrentPage() {
+      const videoList = document.getElementById('videoList');
+      const startIndex = (currentPage - 1) * videosPerPage;
+      const endIndex = startIndex + videosPerPage;
+      const pageVideos = allVideos.slice(startIndex, endIndex);
+      if (pageVideos.length === 0) return showEmptyState();
+      videoList.innerHTML = '';
+      pageVideos.forEach(video => {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        const contentBadge = currentContentType === 'shorts' ? '<span class="content-badge shorts">🎬 쇼츠</span>' : '<span class="content-badge video">📹 비디오</span>';
+        card.innerHTML = `
+          <div class="video-thumbnail">
+            ${video.thumbnail ? `<img src="${video.thumbnail}" alt="${video.title}">` : `<div>thumbnail</div>`}
+            ${contentBadge}
+            ${video.isPopularChannel ? '<span class="popular-channel-badge">⭐ 인기 유튜버</span>' : ''}
+          </div>
+          <div class="video-info">
+            <div class="video-title">${video.title}</div>
+            <div class="video-channel">${video.channelTitle}</div>
+            <div class="video-meta">
+              <span>⏱️ ${video.duration}</span>
+              <span>👀 ${video.viewCount?.toLocaleString() || '정보 없음'}</span>
+            </div>
+            <div class="video-summary">${video.summary || video.description || 'This is Summary'}</div>
+          </div>`;
+        videoList.appendChild(card);
+      });
+    }
+
+    function setupPagination() {
+      const totalPages = Math.ceil(allVideos.length / videosPerPage);
+      const pagination = document.getElementById('pagination');
+      if (totalPages <= 1) return pagination.style.display = 'none';
+      pagination.style.display = 'flex';
+      const pageButtons = pagination.querySelectorAll('.page-number');
+      pageButtons.forEach(btn => {
+        const pageValue = btn.dataset.page;
+        if (pageValue === 'prev') {
+          btn.disabled = currentPage === 1;
+          btn.classList.toggle('disabled', currentPage === 1);
+        } else if (pageValue === 'next') {
+          btn.disabled = currentPage === totalPages;
+          btn.classList.toggle('disabled', currentPage === totalPages);
+        } else {
+          const pageNum = parseInt(pageValue);
+          btn.style.display = pageNum <= totalPages ? 'block' : 'none';
+          btn.classList.toggle('active', pageNum === currentPage);
         }
-        
-        function performSearch() {
-            if (isLoading) return;
-            isLoading = true;
-            document.getElementById('videoList').innerHTML = '';
-            document.getElementById('emptyState').style.display = 'none';
-            const searchQuery = document.getElementById('searchInput').value.trim();
-            
-            // 새로운 검색인 경우에만 서버에 요청
-            const formData = new FormData();
-            formData.append('query', searchQuery || '');
-            formData.append('category', currentCategory);
-            formData.append('subcategory', currentSubcategory);
-            formData.append('page', 1); // 항상 1페이지로 요청
-            formData.append('language', currentLang);
-            formData.append('recent_month', 'true'); // 기본값: 최근 한달
-            formData.append('content_type', currentContentType);
-            
-            fetch('/search', { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success !== false && data.videos && data.videos.length > 0) {
-                    allVideos = data.videos; // 모든 영상 데이터 저장
-                    currentPage = 1; // 페이지를 1로 리셋
-                    displayCurrentPage(); // 현재 페이지 표시
-                    setupPagination(); // 페이지네이션 설정
-                } else {
-                    allVideos = [];
-                    showEmptyState();
-                }
-                isLoading = false;
-            })
-            .catch(error => {
-                allVideos = [];
-                showEmptyState();
-                isLoading = false;
-            });
+      });
+    }
+
+    function showEmptyState() {
+      document.getElementById('videoList').innerHTML = '';
+      document.getElementById('emptyState').style.display = 'block';
+    }
+
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        currentPage = 1;
+        performSearch();
+      }
+    });
+
+    document.querySelectorAll('.page-number').forEach(pageBtn => {
+      pageBtn.addEventListener('click', function () {
+        if (allVideos.length === 0 || this.classList.contains('disabled')) return;
+        const pageValue = this.dataset.page;
+        let newPage = currentPage;
+        if (pageValue === 'prev') newPage = Math.max(1, currentPage - 1);
+        else if (pageValue === 'next') newPage = Math.min(Math.ceil(allVideos.length / videosPerPage), currentPage + 1);
+        else newPage = parseInt(pageValue);
+        if (newPage !== currentPage) {
+          document.querySelectorAll('.page-number').forEach(p => p.classList.remove('active'));
+          currentPage = newPage;
+          document.querySelector(`[data-page="${newPage}"]`).classList.add('active');
+          displayCurrentPage();
+          setupPagination();
         }
-        
-        // 현재 페이지의 영상들만 표시
-        function displayCurrentPage() {
-            const videoList = document.getElementById('videoList');
-            const startIndex = (currentPage - 1) * videosPerPage;
-            const endIndex = startIndex + videosPerPage;
-            const pageVideos = allVideos.slice(startIndex, endIndex);
-            
-            if (pageVideos.length === 0) {
-                showEmptyState();
-                return;
-            }
-            
-            videoList.innerHTML = '';
-            pageVideos.forEach(video => {
-                const card = document.createElement('div');
-                card.className = 'video-card';
-                
-                // 콘텐츠 타입에 따른 뱃지 추가
-                const contentBadge = currentContentType === 'shorts' 
-                    ? '<span class="content-badge shorts">🎬 쇼츠</span>'
-                    : '<span class="content-badge video">📹 비디오</span>';
-                
-                card.innerHTML = `
-                    <div class="video-thumbnail">
-                        ${video.thumbnail ? `<img src="${video.thumbnail}" alt="${video.title}">` : `<div>thumbnail</div>`}
-                        ${contentBadge}
-                        ${video.isPopularChannel ? '<span class="popular-channel-badge">⭐ 인기 유튜버</span>' : ''}
-                    </div>
-                    <div class="video-info">
-                        <div class="video-title">${video.title}</div>
-                        <div class="video-channel">${video.channelTitle}</div>
-                        <div class="video-meta">
-                            <span>⏱️ ${video.duration}</span>
-                            <span>👀 ${video.viewCount?.toLocaleString() || '정보 없음'}</span>
-                        </div>
-                        <div class="video-summary">${video.summary || video.description || 'This is Summary'}</div>
-                    </div>
-                `;
-                videoList.appendChild(card);
-            });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      updateSubcategories(currentCategory);
+      setupDropdowns();
+      performSearch();
+    });
+
+    function setupDropdowns() {
+      const languageMenu = document.getElementById('languageMenu');
+      const languageLabel = document.getElementById('languageLabel');
+      document.getElementById('languageDropdown').addEventListener('click', function (e) {
+        e.stopPropagation();
+        languageMenu.classList.toggle('show');
+        document.getElementById('contentTypeMenu').classList.remove('show');
+      });
+      languageMenu.addEventListener('click', function (e) {
+        if (e.target.classList.contains('dropdown-item')) {
+          languageMenu.querySelector('.active').classList.remove('active');
+          e.target.classList.add('active');
+          languageLabel.textContent = e.target.textContent;
+          currentLang = e.target.dataset.lang;
+          languageMenu.classList.remove('show');
+          performSearch();
         }
-        
-        // 페이지네이션 설정
-        function setupPagination() {
-            const totalPages = Math.ceil(allVideos.length / videosPerPage);
-            const pagination = document.getElementById('pagination');
-            
-            if (totalPages <= 1) {
-                pagination.style.display = 'none';
-                return;
-            }
-            
-            pagination.style.display = 'flex';
-            
-            // 모든 페이지 버튼들 업데이트
-            const pageButtons = pagination.querySelectorAll('.page-number');
-            pageButtons.forEach((btn) => {
-                const pageValue = btn.dataset.page;
-                
-                if (pageValue === 'prev') {
-                    btn.style.display = 'block';
-                    btn.disabled = currentPage === 1;
-                    btn.classList.toggle('disabled', currentPage === 1);
-                } else if (pageValue === 'next') {
-                    btn.style.display = 'block';
-                    btn.disabled = currentPage === totalPages;
-                    btn.classList.toggle('disabled', currentPage === totalPages);
-                } else {
-                    const pageNum = parseInt(pageValue);
-                    if (pageNum <= totalPages) {
-                        btn.style.display = 'block';
-                        btn.classList.toggle('active', pageNum === currentPage);
-                    } else {
-                        btn.style.display = 'none';
-                    }
-                }
-            });
+      });
+
+      const contentTypeMenu = document.getElementById('contentTypeMenu');
+      const contentTypeLabel = document.getElementById('contentTypeLabel');
+      document.getElementById('contentTypeDropdown').addEventListener('click', function (e) {
+        e.stopPropagation();
+        contentTypeMenu.classList.toggle('show');
+        languageMenu.classList.remove('show');
+      });
+      contentTypeMenu.addEventListener('click', function (e) {
+        if (e.target.classList.contains('dropdown-item')) {
+          contentTypeMenu.querySelector('.active').classList.remove('active');
+          e.target.classList.add('active');
+          contentTypeLabel.textContent = e.target.textContent;
+          currentContentType = e.target.dataset.type;
+          contentTypeMenu.classList.remove('show');
+          performSearch();
         }
-        
-        function showEmptyState() {
-            document.getElementById('videoList').innerHTML = '';
-            document.getElementById('emptyState').style.display = 'block';
-        }
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                currentPage = 1;
-                performSearch();
-            }
-        });
-        document.querySelectorAll('.page-number').forEach(pageBtn => {
-            pageBtn.addEventListener('click', function() {
-                if (allVideos.length === 0) return; // 데이터가 없으면 무시
-                if (this.classList.contains('disabled')) return; // 비활성화된 버튼 무시
-                
-                const pageValue = this.dataset.page;
-                let newPage = currentPage;
-                
-                if (pageValue === 'prev') {
-                    newPage = Math.max(1, currentPage - 1);
-                } else if (pageValue === 'next') {
-                    const totalPages = Math.ceil(allVideos.length / videosPerPage);
-                    newPage = Math.min(totalPages, currentPage + 1);
-                } else {
-                    newPage = parseInt(pageValue);
-                }
-                
-                if (newPage !== currentPage) {
-                    document.querySelectorAll('.page-number').forEach(p => p.classList.remove('active'));
-                    if (pageValue !== 'prev' && pageValue !== 'next') {
-                        this.classList.add('active');
-                    } else {
-                        document.querySelector(`[data-page="${newPage}"]`).classList.add('active');
-                    }
-                    currentPage = newPage;
-                    displayCurrentPage(); // 클라이언트 사이드에서 페이지 표시
-                    setupPagination(); // 페이지네이션 상태 업데이트
-                }
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            updateSubcategories('language');
-            currentCategory = 'language';
-            currentSubcategory = 'english';
-            
-            // 드롭다운 초기화
-            setupDropdowns();
-            
-            performSearch();
-        });
-        
-        // 드롭다운 기능
-        function setupDropdowns() {
-            // 언어 드롭다운
-            const languageDropdown = document.getElementById('languageDropdown');
-            const languageMenu = document.getElementById('languageMenu');
-            const languageLabel = document.getElementById('languageLabel');
-            
-            languageDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-                languageMenu.classList.toggle('show');
-                // 다른 드롭다운 닫기
-                document.getElementById('contentTypeMenu').classList.remove('show');
-            });
-            
-            languageMenu.addEventListener('click', function(e) {
-                if (e.target.classList.contains('dropdown-item')) {
-                    // 이전 활성 항목 제거
-                    languageMenu.querySelector('.active').classList.remove('active');
-                    // 새 항목 활성화
-                    e.target.classList.add('active');
-                    // 라벨 업데이트
-                    languageLabel.textContent = e.target.textContent;
-                    // 언어 변경
-                    currentLang = e.target.dataset.lang;
-                    // 드롭다운 닫기
-                    languageMenu.classList.remove('show');
-                    // 검색 실행
-                    performSearch();
-                }
-            });
-            
-            // 콘텐츠 타입 드롭다운
-            const contentTypeDropdown = document.getElementById('contentTypeDropdown');
-            const contentTypeMenu = document.getElementById('contentTypeMenu');
-            const contentTypeLabel = document.getElementById('contentTypeLabel');
-            
-            contentTypeDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-                contentTypeMenu.classList.toggle('show');
-                // 다른 드롭다운 닫기
-                document.getElementById('languageMenu').classList.remove('show');
-            });
-            
-            contentTypeMenu.addEventListener('click', function(e) {
-                if (e.target.classList.contains('dropdown-item')) {
-                    // 이전 활성 항목 제거
-                    contentTypeMenu.querySelector('.active').classList.remove('active');
-                    // 새 항목 활성화
-                    e.target.classList.add('active');
-                    // 라벨 업데이트
-                    contentTypeLabel.textContent = e.target.textContent;
-                    // 콘텐츠 타입 변경
-                    currentContentType = e.target.dataset.type;
-                    // 드롭다운 닫기
-                    contentTypeMenu.classList.remove('show');
-                    // 검색 실행
-                    performSearch();
-                }
-            });
-            
-            // 외부 클릭시 드롭다운 닫기
-            document.addEventListener('click', function() {
-                languageMenu.classList.remove('show');
-                contentTypeMenu.classList.remove('show');
-            });
-        }
-    </script>
+      });
+      document.addEventListener('click', function () {
+        languageMenu.classList.remove('show');
+        contentTypeMenu.classList.remove('show');
+      });
+    }
+  </script>
 </body>
-</html> 
+</html>
