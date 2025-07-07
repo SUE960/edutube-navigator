@@ -90,8 +90,8 @@
     <!-- 사이드바/오버레이 등은 필요시 추가 -->
     <script>
         // 기존 JS 코드 유지 (카테고리, 검색, 결과 표시 등)
-        let currentCategory = 'language';
-        let currentSubcategory = 'english';
+        let currentCategory = 'programming';
+        let currentSubcategory = 'python';
         let currentPage = 1;
         let isLoading = false;
         let currentLang = 'ko';
@@ -115,6 +115,12 @@
                 updateSubcategories(currentCategory);
                 performSearch();
             });
+        });
+        
+        document.querySelector('.category-btn[data-category="programming"]').addEventListener('click', function() {
+            currentCategory = 'programming';
+            currentSubcategory = 'python';
+            performSearch();
         });
         
         function updateSubcategories(category) {
