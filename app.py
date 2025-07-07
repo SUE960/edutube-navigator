@@ -151,6 +151,53 @@ def simplify_search_query(query: str) -> str:
     print(f"검색어 간소화: '{query}' → '{simplified}'")
     return simplified
 
+# 🔍 언어 키워드 매칭용 사전 추가
+LANGUAGE_KEYWORDS = {
+    'english': [
+        '영어', 'english', '회화', '문법', '발음', '표현', '리스닝', '스피킹', '영문법',
+        '영어공부', '기초영어', '비즈니스영어', '영어듣기', '영어말하기', '영작', '토익', '토플',
+        '아이엘츠', '영어단어', '표현력', '미국영어', '영국영어', '원어민', '회화연습', '영어유튜버'
+    ],
+    'chinese': [
+        '중국어', 'hsk', '성조', '병음', '한자', '중문과', '중국', 'chinese', '회화', '문법',
+        '중국어공부', '중국어강의', '중국어입문', '중국어단어', '중국어발음', '중국어듣기',
+        '중국어말하기', '중국어회화', '중국문화', 'HSK6급', 'HSK5급', '중국뉴스'
+    ],
+    'japanese': [
+        '일본어', '히라가나', '카타카나', 'jlpt', 'japanese', '문법', '일본', '회화',
+        '일본어공부', '일본어강의', '일본어단어', '일본어발음', '일본어듣기', '일본어말하기',
+        '일본어회화', '일본문화', 'N1', 'N2', 'N3', '일본유학'
+    ]
+}
+
+# 🔍 자막 기반 언어 키워드 확인 (선택적으로 사용)
+def get_video_caption_text(video_id):
+    try:
+        youtube = get_youtube_service()
+        captions = youtube.captions().list(part='snippet', videoId=video_id).execute()
+        if not captions['items']:
+            return ''
+        caption_id = captions['items'][0]['id']
+        caption_data = youtube.captions().download(id=caption_id).execute()
+        return caption_data.decode('utf-8')
+    except Exception as e:
+        print(f"자막 불러오기 실패: {e}")
+        return ''
+
+# 🔎 제목/설명/자막에 언어 키워드 포함 여부
+
+def is_relevant_language_video(title, description, subcategory, video_id=None):
+    keywords = LANGUAGE_KEYWORDS.get(subcategory.lower(), [])
+    text = f"{title} {description}".lower()
+    found_in_text = any(kw.lower() in text for kw in keywords)
+    if found_in_text:
+        return True
+    if video_id:  # 자막까지 검사할 경우
+        caption_text = get_video_caption_text(video_id).lower()
+        return any(kw.lower() in caption_text for kw in keywords)
+    return False
+
+
 def search_youtube_videos(query, max_results=40, category=None, subcategory=None, duration=None, difficulty=None, language=None, page_token=None, is_shorts=False, recent_month=True):
     youtube = get_youtube_service()
     if youtube is None:
@@ -158,6 +205,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         return {'videos': [], 'nextPageToken': None}
     
     # 카테고리/서브카테고리에 따른 기본 검색어 설정 (교육 키워드 강화)
+    
     if not query:
         if category == 'language' and subcategory == 'english':
             if language == 'ko':
@@ -222,6 +270,7 @@ def search_youtube_videos(query, max_results=40, category=None, subcategory=None
         'type': 'video',
         'order': 'viewCount'  # 인기순으로 고정
     }
+    
     
     # 기본적으로 최근 한달 필터 적용
     if recent_month:
